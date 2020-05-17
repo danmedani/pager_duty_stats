@@ -15,10 +15,13 @@ if __name__ == "__main__":
 	parser.add_argument('--pd-key-file', help='File containing API Key to access api.pagerduty.com')
 	parser.add_argument('--start-date', help='Date to collect alerts from')
 	parser.add_argument('--end-date', help='Date to collect alerts until')
+	parser.add_argument('--service_ids', required=True, type=str, nargs='+', help='PD service ids to collect stats on')
+	parser.add_argument('--max-error-types', type=int, default=10, help='Max number of types to group by')
 	options = parser.parse_args(sys.argv[1:])
 	
 	incidents = fetch_all_incidents(
 		pd_api_key=get_api_key(options.pd_key_file),
+		service_ids=options.service_ids,
 		start_date=options.start_date,
 		end_date=options.end_date
 	)
@@ -26,12 +29,8 @@ if __name__ == "__main__":
 	print_stats(
 		date_col='Week',
 		stats=get_stats_by_week(
-			fetch_all_incidents(
-				pd_api_key=get_api_key(options.pd_key_file),
-				start_date=options.start_date,
-				end_date=options.end_date
-			),
-			10
+			incidents,
+			options.max_error_types
 		)
 	)
 

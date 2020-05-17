@@ -5,14 +5,12 @@ from typing import Dict
 from typing import List
 
 PAGER_DUTY_API = 'https://api.pagerduty.com/incidents'
-HIGH_URGENCY_TEAM = 'P289YKV'
-LOW_URGENCY_TEAM = 'PJQKKBU'
 FETCH_LIMIT = 100
 DEFAULT_START_DATE = '2010-01-01'
 
 def fetch_incident_chunk(
 	pd_api_key: str,
-	teams: List[str],
+	service_ids: List[str],
 	start_date: str,
 	end_date: str,
 	limit: int, 
@@ -25,7 +23,7 @@ def fetch_incident_chunk(
 		'From': 'dmedani@yelp.com'
 	}
 	params = {
-		'service_ids[]': teams,
+		'service_ids[]': service_ids,
 		'since': start_date,
 		'until': end_date,
 		'limit': str(limit),
@@ -36,6 +34,7 @@ def fetch_incident_chunk(
 
 def fetch_all_incidents(
 	pd_api_key: str,
+	service_ids: List[str],
 	start_date: Optional[str],
 	end_date: Optional[str]
 ) -> List[Dict]:
@@ -48,7 +47,7 @@ def fetch_all_incidents(
 	while True:
 		incidents = fetch_incident_chunk(
 			pd_api_key=pd_api_key,
-			teams=[HIGH_URGENCY_TEAM, LOW_URGENCY_TEAM],
+			service_ids=service_ids,
 			start_date=start_date,
 			end_date=end_date,
 			limit=FETCH_LIMIT,
