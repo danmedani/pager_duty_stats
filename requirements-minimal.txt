@@ -1,2 +1,4 @@
 requests
 typing_extensions
+mypy
+pytest

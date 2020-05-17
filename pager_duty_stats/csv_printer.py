@@ -20,7 +20,7 @@ def print_stats(
 		'Wake up Pages'
 	))
 
-	earliest_date = get_earlist_date(stats.keys())
+	earliest_date = get_earlist_date(list(stats.keys()))
 	current_date = datetime.strptime(earliest_date, '%Y-%m-%d')
 	while current_date <= datetime.now():
 		date_str = str(current_date.date())

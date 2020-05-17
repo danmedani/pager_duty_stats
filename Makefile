@@ -1,6 +1,8 @@
 .PHONY: clean
 clean:
 	rm -fr virtual_env
+	rm -fr .mypy_cache
+	rm -fr .pytest_cache
 
 .PHONY: build
 build: clean venv/bin/activate
@@ -21,3 +23,12 @@ fetch_all:
 .PHONY: fetch_some
 fetch_some:
 	@python3 -m pager_duty_stats.print_weekly_stats 2000
+
+.PHONY: mypy
+mypy:
+	. virtual_env/bin/activate ;\
+	mypy pager_duty_stats
+
+.PHONY: test
+test: build mypy
+	pytest tests

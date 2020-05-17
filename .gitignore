@@ -2,3 +2,5 @@
 virtual_env
 *.csv
 __pycache__
+.mypy_cache
+.pytest_cache

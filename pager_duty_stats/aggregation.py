@@ -28,6 +28,16 @@ class IncidentTime(Enum):
 	SLEEP = 2
 	LEISURE = 3
 
+def get_fresh_aggregate_stats() -> AggregrateStats:
+	return AggregrateStats(
+		total_pages=0,
+		low_urgency=0,
+		high_urgency=0,
+		work_hour=0,
+		leisure_hour=0,
+		sleep_hour=0
+	)
+
 
 def is_high_urgency(incident: Dict) -> bool:
 	return incident['service']['summary'] == YC_HIGH_URGENCY
@@ -55,14 +65,7 @@ def get_stats_by_day(incidents: List[Dict]) -> Dict[str, AggregrateStats]:
 		create_date_time = datetime.strptime(incident['created_at'], '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc).astimezone(tz=None)
 		create_date = str(create_date_time.date())
 		if create_date not in incidents_by_day:
-			incidents_by_day[create_date] = AggregrateStats(
-				total_pages=0,
-				low_urgency=0,
-				high_urgency=0,
-				work_hour=0,
-				leisure_hour=0,
-				sleep_hour=0
-			)
+			incidents_by_day[create_date] = get_fresh_aggregate_stats()
 		
 		incidents_by_day[create_date]['total_pages'] += 1
 
@@ -101,30 +104,24 @@ def get_earlist_date(dates: List[str]) -> str:
 
 
 def convert_day_stats_to_week_stats(stats: Dict[str, AggregrateStats]) -> Dict[str, AggregrateStats]:
-	earliest_date = get_earlist_date(stats.keys())
+	earliest_date = get_earlist_date(list(stats.keys()))
 	
 	current_date = datetime.strptime(earliest_date, '%Y-%m-%d')
+	# Skip to the first monday, ignore anything else
 	while current_date.weekday() > 0:
 		current_date += timedelta(days=1)
 
-	week_stats = {}
-	running_week_stats = None
+	week_stats: Dict[str, AggregrateStats] = {}
+	running_week_stats = get_fresh_aggregate_stats()
 	start_of_week = None
 	while current_date <= datetime.now():
 		date_str = str(current_date.date())
 
 		if current_date.weekday() == 0:
-			if running_week_stats:
+			if start_of_week:
 				week_stats[start_of_week] = running_week_stats
 			
-			running_week_stats = AggregrateStats(
-				total_pages=0,
-				low_urgency=0,
-				high_urgency=0,
-				work_hour=0,
-				leisure_hour=0,
-				sleep_hour=0
-			)
+			running_week_stats = get_fresh_aggregate_stats()
 			start_of_week = date_str
 
 		if date_str in stats:
