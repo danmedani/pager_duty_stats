@@ -16,8 +16,8 @@ venv/bin/activate: requirements-minimal.txt
 
 .PHONY: fetch_all
 fetch_all:
-	@python3 aggregate.py 0
+	@python3 -m pager_duty_stats.print_weekly_stats 0
 
-.PHONY: fetch_recent
-fetch_recent:
-	@python3 aggregate.py 3000
+.PHONY: fetch_some
+fetch_some:
+	@python3 -m pager_duty_stats.print_weekly_stats 2000
