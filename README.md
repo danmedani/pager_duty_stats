@@ -8,6 +8,9 @@ Gathering and Aggregating Pager Duty Statistics
 # Building
 make build
 
+# Testing
+make test
+
 # Fetching & Aggregating All Stats
 make fetch_all
 
