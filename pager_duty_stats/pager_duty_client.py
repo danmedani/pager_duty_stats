@@ -1,5 +1,6 @@
 import requests
-from functools import lru_cache
+from typing import Optional
+from datetime import datetime
 from typing import Dict
 from typing import List
 
@@ -7,34 +8,49 @@ PAGER_DUTY_API = 'https://api.pagerduty.com/incidents'
 HIGH_URGENCY_TEAM = 'P289YKV'
 LOW_URGENCY_TEAM = 'PJQKKBU'
 FETCH_LIMIT = 100
-API_KEY_FILE = '.api_key'
+DEFAULT_START_DATE = '2010-01-01'
 
-@lru_cache(maxsize=1)
-def get_api_key() -> str:
-	with open(API_KEY_FILE, 'r') as file:
-		return file.readlines()[0].rstrip('\n')
-
-def fetch_incident_chunk(teams: List[str], limit: int, offset: int) -> List[Dict]:
+def fetch_incident_chunk(
+	pd_api_key: str,
+	teams: List[str],
+	start_date: str,
+	end_date: str,
+	limit: int, 
+	offset: int
+) -> List[Dict]:
 	headers = {
-		'Authorization': 'Token token={api_key}'.format(api_key=get_api_key()),
+		'Authorization': 'Token token={api_key}'.format(api_key=pd_api_key),
 		'Content-Type': 'application/json',
 		'Accept': 'application/json',
 		'From': 'dmedani@yelp.com'
 	}
 	params = {
 		'service_ids[]': teams,
-		'date_range': 'all',
+		'since': start_date,
+		'until': end_date,
 		'limit': str(limit),
 		'offset': str(offset)
 	}
 	r = requests.get(PAGER_DUTY_API, headers=headers, params=params)
 	return r.json()['incidents']
 
-def fetch_all_incidents(offset: int) -> List[Dict]:
+def fetch_all_incidents(
+	pd_api_key: str,
+	start_date: Optional[str],
+	end_date: Optional[str]
+) -> List[Dict]:
 	all_incidents = []
+
+	start_date = start_date or DEFAULT_START_DATE
+	end_date = end_date or str(datetime.now().date())
+
+	offset = 0
 	while True:
 		incidents = fetch_incident_chunk(
+			pd_api_key=pd_api_key,
 			teams=[HIGH_URGENCY_TEAM, LOW_URGENCY_TEAM],
+			start_date=start_date,
+			end_date=end_date,
 			limit=FETCH_LIMIT,
 			offset=offset
 		)
