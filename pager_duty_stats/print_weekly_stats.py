@@ -5,9 +5,12 @@ from pager_duty_stats.csv_printer import print_stats
 
 if __name__ == "__main__":
 	pager_duty_offset = int(sys.argv[1])
+	max_count_types = int(sys.argv[2])
 	print_stats(
 		date_col='Week',
 		stats=get_stats_by_week(
-			fetch_all_incidents(pager_duty_offset)
+			fetch_all_incidents(pager_duty_offset),
+			max_count_types
 		)
 	)
+

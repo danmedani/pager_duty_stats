@@ -10,7 +10,18 @@ def print_stats(
 ) -> None:
 
 	# Header
-	print('{}\t{}\t{}\t{}\t{}\t{}\t{}'.format(
+	all_types_set = set()
+	earliest_date = get_earlist_date(list(stats.keys()))
+	current_date = datetime.strptime(earliest_date, '%Y-%m-%d')
+	while current_date <= datetime.now():
+		date_str = str(current_date.date())
+		if date_str in stats:
+			for error_type, _ in stats[date_str]['error_type_counts'].items():
+				all_types_set.add(error_type)
+		current_date += timedelta(days=1)
+	all_types = list(all_types_set)
+
+	header_str = '{}\t{}\t{}\t{}\t{}\t{}\t{}'.format(
 		date_col,
 		'Total Pages',
 		'Low Urgency',
@@ -18,22 +29,36 @@ def print_stats(
 		'Work Hour Pages',
 		'Leisure Hour Pages',
 		'Wake up Pages'
-	))
+	)
+	for error_type in all_types:
+		header_str = header_str + '\t' + error_type
+	print(header_str)
 
 	earliest_date = get_earlist_date(list(stats.keys()))
 	current_date = datetime.strptime(earliest_date, '%Y-%m-%d')
 	while current_date <= datetime.now():
 		date_str = str(current_date.date())
 		if date_str in stats:
-			print(
-				'{}\t{}\t{}\t{}\t{}\t{}\t{}'.format(
-					date_str,
-					stats[date_str]['total_pages'],
-					stats[date_str]['low_urgency'],
-					stats[date_str]['high_urgency'],
-					stats[date_str]['work_hour'],
-					stats[date_str]['leisure_hour'],
-					stats[date_str]['sleep_hour']
-				)
+			row_str = '{}\t{}\t{}\t{}\t{}\t{}\t{}'.format(
+				date_str,
+				stats[date_str]['total_pages'],
+				stats[date_str]['low_urgency'],
+				stats[date_str]['high_urgency'],
+				stats[date_str]['work_hour'],
+				stats[date_str]['leisure_hour'],
+				stats[date_str]['sleep_hour']
 			)
+			for error_type in all_types:
+				if error_type in stats[date_str]['error_type_counts']:
+					row_str = row_str + '\t' + str(stats[date_str]['error_type_counts'][error_type])
+				else:
+					row_str = row_str + '\t' + '0'
+
+			print(row_str)
 		current_date += timedelta(days=1)
+
+
+
+
+
+

@@ -4,6 +4,7 @@ from datetime import timezone
 from datetime import datetime
 from typing import List
 from typing import Dict
+import copy
 from typing_extensions import TypedDict
 import json
 
@@ -22,11 +23,21 @@ class AggregrateStats(TypedDict):
 	leisure_hour: int
 	sleep_hour: int
 
+	error_type_counts: Dict
+
 
 class IncidentTime(Enum):
 	WORK = 1
 	SLEEP = 2
 	LEISURE = 3
+
+
+def extract_type(incident: Dict) -> str:
+	title_parts = incident['title'].split(' : ')
+	if len(title_parts) > 1:
+		return title_parts[1]
+	return title_parts[0]
+
 
 def get_fresh_aggregate_stats() -> AggregrateStats:
 	return AggregrateStats(
@@ -35,7 +46,8 @@ def get_fresh_aggregate_stats() -> AggregrateStats:
 		high_urgency=0,
 		work_hour=0,
 		leisure_hour=0,
-		sleep_hour=0
+		sleep_hour=0,
+		error_type_counts={}
 	)
 
 
@@ -85,14 +97,20 @@ def get_stats_by_day(incidents: List[Dict]) -> Dict[str, AggregrateStats]:
 			incidents_by_day[create_date]['low_urgency'] += 1
 			incidents_by_day[create_date]['work_hour'] += 1
 
+		incident_type = extract_type(incident)
+		if incident_type not in incidents_by_day[create_date]['error_type_counts']:
+			incidents_by_day[create_date]['error_type_counts'][incident_type] = 0
+		incidents_by_day[create_date]['error_type_counts'][incident_type] += 1
+
 	return incidents_by_day
 
 
-def get_stats_by_week(incidents: List[Dict]) -> Dict[str, AggregrateStats]:
+def get_stats_by_week(incidents: List[Dict], max_count_types) -> Dict[str, AggregrateStats]:
 	return convert_day_stats_to_week_stats(
 		get_stats_by_day(
 			incidents
-		)
+		),
+		max_count_types
 	)
 
 def get_earlist_date(dates: List[str]) -> str:
@@ -103,7 +121,7 @@ def get_earlist_date(dates: List[str]) -> str:
 	return earliest_date
 
 
-def convert_day_stats_to_week_stats(stats: Dict[str, AggregrateStats]) -> Dict[str, AggregrateStats]:
+def convert_day_stats_to_week_stats(stats: Dict[str, AggregrateStats], max_count_types) -> Dict[str, AggregrateStats]:
 	earliest_date = get_earlist_date(list(stats.keys()))
 	
 	current_date = datetime.strptime(earliest_date, '%Y-%m-%d')
@@ -132,7 +150,52 @@ def convert_day_stats_to_week_stats(stats: Dict[str, AggregrateStats]) -> Dict[s
 			running_week_stats['leisure_hour'] += stats[date_str]['leisure_hour']
 			running_week_stats['sleep_hour'] += stats[date_str]['sleep_hour']
 
+			for incident_type, incident_count in stats[date_str]['error_type_counts'].items():
+				if incident_type not in running_week_stats['error_type_counts']:
+					running_week_stats['error_type_counts'][incident_type] = 0
+				running_week_stats['error_type_counts'][incident_type] += incident_count
+
 		current_date += timedelta(days=1)
 
-	return week_stats
+	return clean_error_type_counts(week_stats, max_count_types)
+
+
+def clean_error_type_counts(
+	stats: Dict[str, AggregrateStats],
+	max_count_types: int
+) -> Dict[str, AggregrateStats]:
+	# removes any errors that don't happen v often
+	total_error_type_counts = {}
+	for _, day_stats in stats.items():
+		for error_type, error_type_count in day_stats['error_type_counts'].items():
+			if error_type not in total_error_type_counts:
+				total_error_type_counts[error_type] = 0
+			total_error_type_counts[error_type] += error_type_count
+
+	total_error_type_counts_list = [(key, val) for key, val in total_error_type_counts.items()]
+	total_error_type_counts_list_s = sorted(total_error_type_counts_list, key=lambda pair: -1 * pair[1])
+	if len(total_error_type_counts_list_s) <= max_count_types:
+		# no need to hide anything
+		return stats
+
+	stats_to_keep = set(
+		[error_types for error_types, _ in total_error_type_counts_list_s[:max_count_types]]
+	)
+
+	new_stats = {}
+	for day, _ in stats.items():
+		new_stats[day] = copy.deepcopy(stats[day])
+		for error_type, _ in stats[day]['error_type_counts'].items():
+			if error_type not in stats_to_keep:
+				if 'misc' not in new_stats[day]['error_type_counts']:
+					new_stats[day]['error_type_counts']['misc'] = 0
+				new_stats[day]['error_type_counts']['misc'] += stats[day]['error_type_counts'][error_type]
+				del new_stats[day]['error_type_counts'][error_type]
+
+	return new_stats
+
+
+
+
+
 
