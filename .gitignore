@@ -1,3 +1,4 @@
 .api_key
 virtual_env
 *.csv
+__pycache__

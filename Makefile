@@ -12,12 +12,12 @@ venv/bin/activate: requirements-minimal.txt
 	pip install --upgrade pip ;\
 	pip install -Ur requirements-minimal.txt ;\
 	pip freeze | sort > requirements.txt
-	touch virtual_env/bin/activate  # update so it's as new as requirements-minimal.txt
+	touch virtual_env/bin/activate
 
 .PHONY: fetch_all
 fetch_all:
-	@python3 aggregate.py 0
+	@python3 -m pager_duty_stats.print_weekly_stats 0
 
-.PHONY: fetch_recent
-fetch_recent:
-	@python3 aggregate.py 3000
+.PHONY: fetch_some
+fetch_some:
+	@python3 -m pager_duty_stats.print_weekly_stats 2000
