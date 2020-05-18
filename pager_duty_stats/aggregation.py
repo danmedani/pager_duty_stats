@@ -232,7 +232,3 @@ def clean_error_type_counts(
 	return new_stats
 
 
-
-
-
-
