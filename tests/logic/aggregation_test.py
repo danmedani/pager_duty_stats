@@ -1,7 +1,7 @@
 from datetime import datetime
 from datetime import timezone
 
-from pager_duty_stats.aggregation import is_week_day
+from pager_duty_stats.logic.aggregation import is_week_day
 
 def test_is_mon_week_day():
 	assert is_week_day(datetime.strptime('2020-05-18', '%Y-%m-%d').replace(tzinfo=timezone.utc))
