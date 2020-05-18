@@ -143,9 +143,9 @@ def fill_out_empty_days(
 	end_date: str
 ) -> Dict[str, AggregrateStats]:
 	current_date = datetime.strptime(start_date, '%Y-%m-%d')
-	end_date = datetime.strptime(end_date, '%Y-%m-%d')
+	last_date = datetime.strptime(end_date, '%Y-%m-%d')
 
-	while current_date <= end_date:
+	while current_date <= last_date:
 		date_str = str(current_date.date())
 		if date_str not in stats:
 			stats[date_str] = get_fresh_aggregate_stats()
