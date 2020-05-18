@@ -67,10 +67,11 @@ def classify_incident_time(time: datetime) -> IncidentTime:
 
 
 def get_stats_by_day(
-	incidents: List[Dict], 
-	max_count_types: int,
+	incidents: List[Dict],
 	start_date: str,
-	end_date: str
+	end_date: str,
+	include_error_types: bool,
+	max_error_types: int
 ) -> Dict[str, AggregrateStats]:
 	incidents_by_day = {}
 
@@ -96,31 +97,35 @@ def get_stats_by_day(
 		else:
 			incidents_by_day[create_date]['leisure_hour'] += 1
 
-		incident_type = extract_type(incident)
-		if incident_type not in incidents_by_day[create_date]['error_type_counts']:
-			incidents_by_day[create_date]['error_type_counts'][incident_type] = 0
-		incidents_by_day[create_date]['error_type_counts'][incident_type] += 1
+		if include_error_types:
+			incident_type = extract_type(incident)
+			if incident_type not in incidents_by_day[create_date]['error_type_counts']:
+				incidents_by_day[create_date]['error_type_counts'][incident_type] = 0
+			incidents_by_day[create_date]['error_type_counts'][incident_type] += 1
 
 	return clean_error_type_counts(
 		fill_out_empty_days(
 			incidents_by_day, 
 			start_date, 
 			end_date
-		), max_count_types
+		), 
+		max_error_types
 	)
 
 def get_stats(
 	incidents: List[Dict],
 	start_date: str,
 	end_date: str,
-	max_count_types: int,
-	grouping_window: GroupingWindow
+	grouping_window: GroupingWindow,
+	include_error_types: bool,
+	max_error_types: int
 ):
 	stats_by_day = get_stats_by_day(
 		incidents,
-		max_count_types,
 		start_date,
-		end_date
+		end_date,
+		include_error_types,
+		max_error_types
 	)
 
 	if grouping_window == GroupingWindow.WEEK:
@@ -199,7 +204,7 @@ def convert_day_stats_to_week_stats(stats: Dict[str, AggregrateStats]) -> Dict[s
 
 def clean_error_type_counts(
 	stats: Dict[str, AggregrateStats],
-	max_count_types: int
+	max_error_types: int
 ) -> Dict[str, AggregrateStats]:
 	# removes any errors that don't happen v often
 	total_error_type_counts = {}
@@ -211,12 +216,12 @@ def clean_error_type_counts(
 
 	total_error_type_counts_list = [(key, val) for key, val in total_error_type_counts.items()]
 	total_error_type_counts_list_s = sorted(total_error_type_counts_list, key=lambda pair: -1 * pair[1])
-	if len(total_error_type_counts_list_s) <= max_count_types:
+	if len(total_error_type_counts_list_s) <= max_error_types:
 		# no need to hide anything
 		return stats
 
 	stats_to_keep = set(
-		[error_types for error_types, _ in total_error_type_counts_list_s[:max_count_types]]
+		[error_types for error_types, _ in total_error_type_counts_list_s[:max_error_types]]
 	)
 
 	new_stats = {}
