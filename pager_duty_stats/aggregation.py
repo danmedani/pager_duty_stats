@@ -10,19 +10,16 @@ import json
 
 from pager_duty_stats.pager_duty_client import fetch_all_incidents
 
-YC_HIGH_URGENCY = 'Yelp Connect CRITICAL Urgency'
 START_FOUR_DAY_WORK_WEEK = datetime.strptime('2020-04-20', '%Y-%m-%d').replace(tzinfo=timezone.utc)
 
 class AggregrateStats(TypedDict):
 	total_pages: int
-	
-	low_urgency: int
-	high_urgency: int
 
 	work_hour: int
 	leisure_hour: int
 	sleep_hour: int
 
+	per_service: Dict
 	error_type_counts: Dict
 
 
@@ -42,17 +39,12 @@ def extract_type(incident: Dict) -> str:
 def get_fresh_aggregate_stats() -> AggregrateStats:
 	return AggregrateStats(
 		total_pages=0,
-		low_urgency=0,
-		high_urgency=0,
+		per_service={},
 		work_hour=0,
 		leisure_hour=0,
 		sleep_hour=0,
 		error_type_counts={}
 	)
-
-
-def is_high_urgency(incident: Dict) -> bool:
-	return incident['service']['summary'] == YC_HIGH_URGENCY
 
 def is_week_day(time: datetime) -> bool:
 	if time < START_FOUR_DAY_WORK_WEEK:
@@ -81,21 +73,19 @@ def get_stats_by_day(incidents: List[Dict]) -> Dict[str, AggregrateStats]:
 		
 		incidents_by_day[create_date]['total_pages'] += 1
 
-		if is_high_urgency(incident):
-			incidents_by_day[create_date]['high_urgency'] += 1
+		if incident['service']['summary'] not in incidents_by_day[create_date]['per_service']:
+			incidents_by_day[create_date]['per_service'][incident['service']['summary']] = 0
 
-			incident_time = classify_incident_time(create_date_time)
+		incidents_by_day[create_date]['per_service'][incident['service']['summary']] += 1
 
-			if incident_time == IncidentTime.WORK:
-				incidents_by_day[create_date]['work_hour'] += 1
-			elif incident_time == IncidentTime.SLEEP:
-				incidents_by_day[create_date]['sleep_hour'] += 1
-			else:
-				incidents_by_day[create_date]['leisure_hour'] += 1
-		else:
-			# Low Urgency incidents only page during work hours
-			incidents_by_day[create_date]['low_urgency'] += 1
+		incident_time = classify_incident_time(create_date_time)
+
+		if incident_time == IncidentTime.WORK:
 			incidents_by_day[create_date]['work_hour'] += 1
+		elif incident_time == IncidentTime.SLEEP:
+			incidents_by_day[create_date]['sleep_hour'] += 1
+		else:
+			incidents_by_day[create_date]['leisure_hour'] += 1
 
 		incident_type = extract_type(incident)
 		if incident_type not in incidents_by_day[create_date]['error_type_counts']:
@@ -144,11 +134,14 @@ def convert_day_stats_to_week_stats(stats: Dict[str, AggregrateStats], max_count
 
 		if date_str in stats:
 			running_week_stats['total_pages'] += stats[date_str]['total_pages']
-			running_week_stats['low_urgency'] += stats[date_str]['low_urgency']
-			running_week_stats['high_urgency'] += stats[date_str]['high_urgency']
 			running_week_stats['work_hour'] += stats[date_str]['work_hour']
 			running_week_stats['leisure_hour'] += stats[date_str]['leisure_hour']
 			running_week_stats['sleep_hour'] += stats[date_str]['sleep_hour']
+
+			for service, incident_count in stats[date_str]['per_service'].items():
+				if service not in running_week_stats['per_service']:
+					running_week_stats['per_service'][service] = 0
+				running_week_stats['per_service'][service] += incident_count
 
 			for incident_type, incident_count in stats[date_str]['error_type_counts'].items():
 				if incident_type not in running_week_stats['error_type_counts']:
