@@ -1,16 +1,14 @@
 # pager_duty_stats
-Gathering and Aggregating Pager Duty Statistics
+Gathers and aggregates pager duty incident statistics and outputs tab-separated csv. 
 
-This library aggregates pager duty statistics for a list of teams and outputs tab-separated csv. 
+## Main feature:
+1. Ability to aggregate incident counts by day or by week across a date range for a set of services. See `--start-date` and `--end-date` for the time range, `--grouping-window` for aggregation bucket type, and `--service_ids` for which PD services you want to collect stats for.
 
-Main feature:
-1. Ability to aggregate incident counts by day or by week across a date range for a set of services. See `--start-date` and `--end-date` for the time range, `--grouping-window` for aggregation bucket size, and `--service_ids` for which PD services you want to collect stats for.
-
-Other features:
+## Other features:
 1. Can include a break-down of when pages are happening (during work-hours, during off hours, or during sleep hours). See `--include-time-of-day-counts`.
 2. Can include groupings of the most common error types that are happening. See `--include-incident-types`, `--max-incident-types`, and `--incident-type-extraction-technique`.
 
-I usually just pipe the output into a file and import it into google sheets to get nice visuals. The stacked column chart is really good for this output.
+I usually just pipe the output into a file and import it into google sheets to get nice visuals. The stacked column chart is really good for this type of chart.
 
 
 # API Token
