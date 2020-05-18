@@ -22,4 +22,4 @@ def extract_incidient_type(
 			return title_parts[1]
 		return title_parts[0]
 
-	raise('ExtractionTechnique {} not implemented'.format(extraction_technique))
+	raise Exception('ExtractionTechnique {} not implemented'.format(extraction_technique))
