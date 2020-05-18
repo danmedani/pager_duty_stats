@@ -6,6 +6,7 @@ from pager_duty_stats.logic.pager_duty_client import fetch_all_incidents
 from pager_duty_stats.logic.aggregation import get_stats
 from pager_duty_stats.logic.csv_printer import print_stats
 from pager_duty_stats.logic.aggregation import GroupingWindow
+from pager_duty_stats.logic.incident_types import ExtractionTechnique
 from argparse import Namespace
 
 
@@ -22,11 +23,13 @@ def parse_args() -> Namespace:
 	parser.add_argument('--service_ids', required=True, type=str, nargs='+', help='PD service ids to collect stats on')
 	parser.add_argument('--start-date', default=DEFAULT_START_DATE, help='Date to collect alerts from (YYYY-MM-DD)')
 	parser.add_argument('--end-date', default=str(datetime.now().date()), help='Date to collect alerts until (YYYY-MM-DD) (default: todays date)')
-	parser.add_argument('--grouping-window', default='week', type=GroupingWindow, choices=list(GroupingWindow), help='Group alerts by day, or by week? If by week, this only collects complete weeks (from Monday -> Sunday)')
+	parser.add_argument('--grouping-window', default=GroupingWindow.WEEK, type=GroupingWindow, choices=list(GroupingWindow), help='Group alerts by day, or by week? If by week, this only collects complete weeks (from Monday -> Sunday)')
 	
 	parser.add_argument('--include-time-of-day-counts', action='store_true', default=False, help='Includes breakdown of what time (work hours, off hours, sleep hours) errors are happening')
-	parser.add_argument('--include-error-types', action='store_true', default=False, help='Includes breakdown of which errors specifically are happening')
-	parser.add_argument('--max-error-types', type=int, default=10, help='If --include-error-types is used, --max-error-types determines how many of the most common errors to show. (default: 10)')
+
+	parser.add_argument('--include-incident-types', action='store_true', default=False, help='Includes breakdown of the types of errors that are happening')
+	parser.add_argument('--incident-type-extraction-technique', default=ExtractionTechnique.YC, type=ExtractionTechnique, choices=list(ExtractionTechnique), help='Technique for reducing/classifying incidents. See pager_duty_stats.logic.incident_types for more details')
+	parser.add_argument('--max-incident-types', type=int, default=10, help='If --include-incident-types is used, --max-incident-types determines how many of the most common errors to show. (default: 10)')
 	
 	return parser.parse_args(sys.argv[1:])
 
@@ -44,13 +47,14 @@ if __name__ == "__main__":
 	print_stats(
 		date_col=str(options.grouping_window).capitalize(),
 		stats=get_stats(
-			incidents,
-			options.start_date,
-			options.end_date,
-			options.grouping_window,
-			options.include_time_of_day_counts,
-			options.include_error_types,
-			options.max_error_types
+			incidents=incidents,
+			start_date=options.start_date,
+			end_date=options.end_date,
+			grouping_window=options.grouping_window,
+			include_time_of_day_counts=options.include_time_of_day_counts,
+			include_incident_types=options.include_incident_types,
+			incident_type_extraction_technique=options.incident_type_extraction_technique,
+			max_incident_types=options.max_incident_types
 		)
 	)
 

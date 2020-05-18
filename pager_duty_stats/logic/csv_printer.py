@@ -10,7 +10,7 @@ def print_stats(
 ) -> None:
 
 	# Header
-	all_error_types_set = set()
+	all_incident_types_set = set()
 	all_services_set = set()
 	all_times_of_day_set = set()
 	earliest_date = get_earlist_date(list(stats.keys()))
@@ -25,12 +25,12 @@ def print_stats(
 				all_times_of_day_set.add(time_of_day)
 
 			for error_type, _ in stats[date_str]['error_type_counts'].items():
-				all_error_types_set.add(error_type)
+				all_incident_types_set.add(error_type)
 
 
 		current_date += timedelta(days=1)
 
-	all_error_types = list(all_error_types_set)
+	all_incident_types = list(all_incident_types_set)
 	all_services = list(all_services_set)
 	all_times_of_day = list(all_times_of_day_set)
 
@@ -42,7 +42,7 @@ def print_stats(
 		header_str = header_str + '\t' + service
 	for time_of_day in all_times_of_day:
 		header_str = header_str + '\t' + time_of_day
-	for error_type in all_error_types:
+	for error_type in all_incident_types:
 		header_str = header_str + '\t' + error_type
 	print(header_str)
 
@@ -68,7 +68,7 @@ def print_stats(
 				else:
 					row_str = row_str + '\t' + '0'
 
-			for error_type in all_error_types:
+			for error_type in all_incident_types:
 				if error_type in stats[date_str]['error_type_counts']:
 					row_str = row_str + '\t' + str(stats[date_str]['error_type_counts'][error_type])
 				else:

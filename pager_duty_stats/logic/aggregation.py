@@ -9,6 +9,8 @@ from typing_extensions import TypedDict
 import json
 
 from pager_duty_stats.logic.pager_duty_client import fetch_all_incidents
+from pager_duty_stats.logic.incident_types import extract_incidient_type
+from pager_duty_stats.logic.incident_types import ExtractionTechnique
 
 class GroupingWindow(Enum):
 	DAY = 'day'
@@ -37,13 +39,6 @@ class IncidentTime(Enum):
 		return self.value
 
 
-def extract_type(incident: Dict) -> str:
-	title_parts = incident['title'].split(' : ')
-	if len(title_parts) > 1:
-		return title_parts[1]
-	return title_parts[0]
-
-
 def get_fresh_aggregate_stats() -> AggregrateStats:
 	return AggregrateStats(
 		total_pages=0,
@@ -70,8 +65,9 @@ def get_stats_by_day(
 	start_date: str,
 	end_date: str,
 	include_time_of_day_counts: bool,
-	include_error_types: bool,
-	max_error_types: int
+	include_incident_types: bool,
+	max_incident_types: int,
+	incident_type_extraction_technique: ExtractionTechnique
 ) -> Dict[str, AggregrateStats]:
 	incidents_by_day = {}
 
@@ -94,8 +90,11 @@ def get_stats_by_day(
 				incidents_by_day[create_date]['per_time_of_day'][incident_time_str] = 0
 			incidents_by_day[create_date]['per_time_of_day'][incident_time_str] += 1
 
-		if include_error_types:
-			incident_type = extract_type(incident)
+		if include_incident_types:
+			incident_type = extract_incidient_type(
+				incident,
+				incident_type_extraction_technique
+			)
 			if incident_type not in incidents_by_day[create_date]['error_type_counts']:
 				incidents_by_day[create_date]['error_type_counts'][incident_type] = 0
 			incidents_by_day[create_date]['error_type_counts'][incident_type] += 1
@@ -106,7 +105,7 @@ def get_stats_by_day(
 			start_date, 
 			end_date
 		), 
-		max_error_types
+		max_incident_types
 	)
 
 def get_stats(
@@ -115,16 +114,18 @@ def get_stats(
 	end_date: str,
 	grouping_window: GroupingWindow,
 	include_time_of_day_counts: bool,
-	include_error_types: bool,
-	max_error_types: int
+	include_incident_types: bool,
+	incident_type_extraction_technique: ExtractionTechnique,
+	max_incident_types: int
 ):
 	stats_by_day = get_stats_by_day(
 		incidents,
 		start_date,
 		end_date,
 		include_time_of_day_counts,
-		include_error_types,
-		max_error_types
+		include_incident_types,
+		max_incident_types,
+		incident_type_extraction_technique
 	)
 
 	if grouping_window == GroupingWindow.WEEK:
@@ -205,7 +206,7 @@ def convert_day_stats_to_week_stats(stats: Dict[str, AggregrateStats]) -> Dict[s
 
 def clean_error_type_counts(
 	stats: Dict[str, AggregrateStats],
-	max_error_types: int
+	max_incident_types: int
 ) -> Dict[str, AggregrateStats]:
 	# removes any errors that don't happen v often
 	total_error_type_counts = {}
@@ -217,12 +218,12 @@ def clean_error_type_counts(
 
 	total_error_type_counts_list = [(key, val) for key, val in total_error_type_counts.items()]
 	total_error_type_counts_list_s = sorted(total_error_type_counts_list, key=lambda pair: -1 * pair[1])
-	if len(total_error_type_counts_list_s) <= max_error_types:
+	if len(total_error_type_counts_list_s) <= max_incident_types:
 		# no need to hide anything
 		return stats
 
 	stats_to_keep = set(
-		[error_types for error_types, _ in total_error_type_counts_list_s[:max_error_types]]
+		[incident_types for incident_types, _ in total_error_type_counts_list_s[:max_incident_types]]
 	)
 
 	new_stats = {}
