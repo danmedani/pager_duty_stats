@@ -129,7 +129,7 @@ def get_stats(
 	)
 
 	if grouping_window == GroupingWindow.WEEK:
-		return convert_day_stats_to_week_stats(stats_by_day)
+		return convert_day_stats_to_week_stats(stats_by_day, end_date)
 	
 	if grouping_window == GroupingWindow.DAY:
 		return stats_by_day
@@ -160,7 +160,10 @@ def get_earlist_date(dates: List[str]) -> str:
 	return earliest_date
 
 
-def convert_day_stats_to_week_stats(stats: Dict[str, AggregrateStats]) -> Dict[str, AggregrateStats]:
+def convert_day_stats_to_week_stats(
+	stats: Dict[str, AggregrateStats],
+	end_date: str
+) -> Dict[str, AggregrateStats]:
 	earliest_date = get_earlist_date(list(stats.keys()))
 	
 	current_date = datetime.strptime(earliest_date, '%Y-%m-%d')
@@ -168,10 +171,11 @@ def convert_day_stats_to_week_stats(stats: Dict[str, AggregrateStats]) -> Dict[s
 	while current_date.weekday() > 0:
 		current_date += timedelta(days=1)
 
+	last_date = datetime.strptime(end_date, '%Y-%m-%d')
 	week_stats: Dict[str, AggregrateStats] = {}
 	running_week_stats = get_fresh_aggregate_stats()
 	start_of_week = None
-	while current_date <= datetime.now():
+	while current_date <= last_date:
 		date_str = str(current_date.date())
 
 		if current_date.weekday() == 0:
