@@ -12,7 +12,7 @@ def get_api_key(file_name: str) -> str:
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description='Aggregate PagerDuty Stats & output csv')
-	parser.add_argument('--pd-key-file', help='File containing API Key to access api.pagerduty.com')
+	parser.add_argument('--pd-key-file', default='.api_key', help='File containing API Key to access api.pagerduty.com')
 	parser.add_argument('--start-date', help='Date to collect alerts from')
 	parser.add_argument('--end-date', help='Date to collect alerts until')
 	parser.add_argument('--service_ids', required=True, type=str, nargs='+', help='PD service ids to collect stats on')

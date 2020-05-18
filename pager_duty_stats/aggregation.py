@@ -10,7 +10,6 @@ import json
 
 from pager_duty_stats.pager_duty_client import fetch_all_incidents
 
-START_FOUR_DAY_WORK_WEEK = datetime.strptime('2020-04-20', '%Y-%m-%d').replace(tzinfo=timezone.utc)
 
 class AggregrateStats(TypedDict):
 	total_pages: int
@@ -47,10 +46,7 @@ def get_fresh_aggregate_stats() -> AggregrateStats:
 	)
 
 def is_week_day(time: datetime) -> bool:
-	if time < START_FOUR_DAY_WORK_WEEK:
-		return time.weekday() < 5
-	else:
-		return time.weekday() < 4
+	return time.weekday() < 5
 
 def classify_incident_time(time: datetime) -> IncidentTime:
 	if time.hour < 8:
