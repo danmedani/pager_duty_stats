@@ -22,18 +22,19 @@ class GroupingWindow(Enum):
 class AggregrateStats(TypedDict):
 	total_pages: int
 
-	work_hour: int
-	leisure_hour: int
-	sleep_hour: int
-
-	per_service: Dict
-	error_type_counts: Dict
+	per_time_of_day: Dict[str, int]
+	per_service: Dict[str, int]
+	error_type_counts: Dict[str, int]
 
 
 class IncidentTime(Enum):
-	WORK = 1
-	SLEEP = 2
-	LEISURE = 3
+	WORK = 'work'
+	SLEEP = 'sleep'
+	LEISURE = 'leisure'
+
+	# useful for making output human readable
+	def __str__(self):
+		return self.value
 
 
 def extract_type(incident: Dict) -> str:
@@ -47,9 +48,7 @@ def get_fresh_aggregate_stats() -> AggregrateStats:
 	return AggregrateStats(
 		total_pages=0,
 		per_service={},
-		work_hour=0,
-		leisure_hour=0,
-		sleep_hour=0,
+		per_time_of_day={},
 		error_type_counts={}
 	)
 
@@ -70,6 +69,7 @@ def get_stats_by_day(
 	incidents: List[Dict],
 	start_date: str,
 	end_date: str,
+	include_time_of_day_counts: bool,
 	include_error_types: bool,
 	max_error_types: int
 ) -> Dict[str, AggregrateStats]:
@@ -88,14 +88,11 @@ def get_stats_by_day(
 
 		incidents_by_day[create_date]['per_service'][incident['service']['summary']] += 1
 
-		incident_time = classify_incident_time(create_date_time)
-
-		if incident_time == IncidentTime.WORK:
-			incidents_by_day[create_date]['work_hour'] += 1
-		elif incident_time == IncidentTime.SLEEP:
-			incidents_by_day[create_date]['sleep_hour'] += 1
-		else:
-			incidents_by_day[create_date]['leisure_hour'] += 1
+		if include_time_of_day_counts:
+			incident_time_str = str(classify_incident_time(create_date_time))
+			if incident_time_str not in incidents_by_day[create_date]['per_time_of_day']:
+				incidents_by_day[create_date]['per_time_of_day'][incident_time_str] = 0
+			incidents_by_day[create_date]['per_time_of_day'][incident_time_str] += 1
 
 		if include_error_types:
 			incident_type = extract_type(incident)
@@ -117,6 +114,7 @@ def get_stats(
 	start_date: str,
 	end_date: str,
 	grouping_window: GroupingWindow,
+	include_time_of_day_counts: bool,
 	include_error_types: bool,
 	max_error_types: int
 ):
@@ -124,6 +122,7 @@ def get_stats(
 		incidents,
 		start_date,
 		end_date,
+		include_time_of_day_counts,
 		include_error_types,
 		max_error_types
 	)
@@ -183,9 +182,11 @@ def convert_day_stats_to_week_stats(stats: Dict[str, AggregrateStats]) -> Dict[s
 
 		if date_str in stats:
 			running_week_stats['total_pages'] += stats[date_str]['total_pages']
-			running_week_stats['work_hour'] += stats[date_str]['work_hour']
-			running_week_stats['leisure_hour'] += stats[date_str]['leisure_hour']
-			running_week_stats['sleep_hour'] += stats[date_str]['sleep_hour']
+			
+			for incident_time, incident_count in stats[date_str]['per_time_of_day'].items():
+				if service not in running_week_stats['per_time_of_day']:
+					running_week_stats['per_time_of_day'][incident_time] = 0
+				running_week_stats['per_time_of_day'][incident_time] += incident_count			
 
 			for service, incident_count in stats[date_str]['per_service'].items():
 				if service not in running_week_stats['per_service']:
