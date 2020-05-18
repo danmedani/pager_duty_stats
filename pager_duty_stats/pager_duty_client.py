@@ -6,7 +6,6 @@ from typing import List
 
 PAGER_DUTY_API = 'https://api.pagerduty.com/incidents'
 FETCH_LIMIT = 100
-DEFAULT_START_DATE = '2010-01-01'
 
 def fetch_incident_chunk(
 	pd_api_key: str,
@@ -35,13 +34,10 @@ def fetch_incident_chunk(
 def fetch_all_incidents(
 	pd_api_key: str,
 	service_ids: List[str],
-	start_date: Optional[str],
-	end_date: Optional[str]
+	start_date: str,
+	end_date: str
 ) -> List[Dict]:
 	all_incidents = []
-
-	start_date = start_date or DEFAULT_START_DATE
-	end_date = end_date or str(datetime.now().date())
 
 	offset = 0
 	while True:

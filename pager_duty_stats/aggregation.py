@@ -10,6 +10,14 @@ import json
 
 from pager_duty_stats.pager_duty_client import fetch_all_incidents
 
+class GroupingWindow(Enum):
+	DAY = 'day'
+	WEEK = 'week'
+
+	# useful for making args human readable
+	def __str__(self):
+		return self.value
+
 
 class AggregrateStats(TypedDict):
 	total_pages: int
@@ -58,7 +66,7 @@ def classify_incident_time(time: datetime) -> IncidentTime:
 	return IncidentTime.WORK if time.hour < 18 else IncidentTime.LEISURE
 
 
-def get_stats_by_day(incidents: List[Dict]) -> Dict[str, AggregrateStats]:
+def get_stats_by_day(incidents: List[Dict], max_count_types: int) -> Dict[str, AggregrateStats]:
 	incidents_by_day = {}
 
 	for incident in incidents:
@@ -88,15 +96,31 @@ def get_stats_by_day(incidents: List[Dict]) -> Dict[str, AggregrateStats]:
 			incidents_by_day[create_date]['error_type_counts'][incident_type] = 0
 		incidents_by_day[create_date]['error_type_counts'][incident_type] += 1
 
-	return incidents_by_day
+	return clean_error_type_counts(incidents_by_day, max_count_types)
+
+def get_stats(
+	incidents: List[Dict],
+	max_count_types: int,
+	grouping_window: GroupingWindow
+):
+	if grouping_window == GroupingWindow.WEEK:
+		return get_stats_by_week(incidents, max_count_types)
+	
+	if grouping_window == GroupingWindow.DAY:
+		return get_stats_by_day(incidents, max_count_types)
+
+	raise Exception('Grouping Window {} not recognized'.format(grouping_window))
 
 
-def get_stats_by_week(incidents: List[Dict], max_count_types) -> Dict[str, AggregrateStats]:
+def get_stats_by_week(
+	incidents: List[Dict], 
+	max_count_types: int
+) -> Dict[str, AggregrateStats]:
 	return convert_day_stats_to_week_stats(
 		get_stats_by_day(
-			incidents
-		),
-		max_count_types
+			incidents,
+			max_count_types
+		)
 	)
 
 def get_earlist_date(dates: List[str]) -> str:
@@ -107,7 +131,7 @@ def get_earlist_date(dates: List[str]) -> str:
 	return earliest_date
 
 
-def convert_day_stats_to_week_stats(stats: Dict[str, AggregrateStats], max_count_types) -> Dict[str, AggregrateStats]:
+def convert_day_stats_to_week_stats(stats: Dict[str, AggregrateStats]) -> Dict[str, AggregrateStats]:
 	earliest_date = get_earlist_date(list(stats.keys()))
 	
 	current_date = datetime.strptime(earliest_date, '%Y-%m-%d')
@@ -146,7 +170,7 @@ def convert_day_stats_to_week_stats(stats: Dict[str, AggregrateStats], max_count
 
 		current_date += timedelta(days=1)
 
-	return clean_error_type_counts(week_stats, max_count_types)
+	return week_stats
 
 
 def clean_error_type_counts(
