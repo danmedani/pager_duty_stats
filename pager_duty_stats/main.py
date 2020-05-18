@@ -28,8 +28,8 @@ def parse_args() -> Namespace:
 	parser.add_argument('--include-time-of-day-counts', action='store_true', default=False, help='Includes breakdown of what time (work hours, off hours, sleep hours) errors are happening')
 
 	parser.add_argument('--include-incident-types', action='store_true', default=False, help='Includes breakdown of the types of errors that are happening')
-	parser.add_argument('--incident-type-extraction-technique', default=ExtractionTechnique.YC, type=ExtractionTechnique, choices=list(ExtractionTechnique), help='Technique for reducing/classifying incidents. See pager_duty_stats.logic.incident_types for more details')
-	parser.add_argument('--max-incident-types', type=int, default=10, help='If --include-incident-types is used, --max-incident-types determines how many of the most common errors to show. (default: 10)')
+	parser.add_argument('--incident-type-extraction-technique', default=ExtractionTechnique.YC, type=ExtractionTechnique, choices=list(ExtractionTechnique), help='Technique for reducing/classifying incidents (for use with --include-incident-types). See pager_duty_stats.logic.incident_types for more details')
+	parser.add_argument('--max-incident-types', type=int, default=10, help='(For use with --include-incident-types): this determines how many of the most common incident types to show. (default: 10)')
 	
 	return parser.parse_args(sys.argv[1:])
 

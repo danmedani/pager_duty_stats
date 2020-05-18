@@ -5,6 +5,10 @@ class ExtractionTechnique(Enum):
 	TITLE = 'title'
 	YC = 'yc'
 
+	# useful for making args human readable
+	def __str__(self):
+		return self.value
+
 def extract_incidient_type(
 	incident: Dict,
 	extraction_technique: ExtractionTechnique
