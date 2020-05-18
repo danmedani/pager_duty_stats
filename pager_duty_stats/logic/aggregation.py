@@ -164,7 +164,7 @@ def convert_day_stats_to_week_stats(stats: Dict[str, AggregrateStats]) -> Dict[s
 	earliest_date = get_earlist_date(list(stats.keys()))
 	
 	current_date = datetime.strptime(earliest_date, '%Y-%m-%d')
-	# Skip to the first monday, ignore anything else
+	# Skip to the first monday, ignore anything before then
 	while current_date.weekday() > 0:
 		current_date += timedelta(days=1)
 
@@ -185,7 +185,7 @@ def convert_day_stats_to_week_stats(stats: Dict[str, AggregrateStats]) -> Dict[s
 			running_week_stats['total_pages'] += stats[date_str]['total_pages']
 			
 			for incident_time, incident_count in stats[date_str]['per_time_of_day'].items():
-				if service not in running_week_stats['per_time_of_day']:
+				if incident_time not in running_week_stats['per_time_of_day']:
 					running_week_stats['per_time_of_day'][incident_time] = 0
 				running_week_stats['per_time_of_day'][incident_time] += incident_count			
 
