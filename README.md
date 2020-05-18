@@ -21,21 +21,26 @@ I usually just pipe the output into a file and import it into google sheets to g
 # Testing (need to be in virtual env)
 1. `make test`
 
-# Fetching & Aggregating Stats (outputs tab-seperated csv)
+# Fetching & Aggregating Stats
 
-After running `source virtual_env/bin/activate`, here's some examples of what you can do:
+This outputs a tab-seperated csv. 
+
+After running `source virtual_env/bin/activate`, here's an example using all the options:
 
 ```
-python -m pager_duty_stats.main --include-time-of-day-counts --service_ids X289YKV L289YK3 --start-date 2020-01-01
-
-
-python -m pager_duty_stats.main --pd-key-file ~/.keys/pd_key --service_ids X289YKV --start-date 2019-01-01 --end-date 2020-01-01 --grouping-window week > output.csv
-
-
-python -m pager_duty_stats.main --service_ids X289YKV --start-date 2019-01-01 --grouping-window day --include-incident-types --max-incident-types 3 --incident-type-extraction-technique title > output.csv
+python -m pager_duty_stats.main \
+	--pd-key-file .api_key \
+	--grouping-window day \
+	--service_ids G289YKF R289YKF \
+	--start-date 2020-01-01 \
+	--end-date 2020-04-01 \
+	--include-time-of-day-counts \
+	--include-incident-types \
+	--max-incident-types 3 \
+	--incident-type-extraction-technique title
 ```
 
-To see all options, use:
+To see more information about the options:
 ```
 python -m pager_duty_stats.main --help
 ```

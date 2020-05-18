@@ -30,6 +30,10 @@ def fetch_incident_chunk(
 		'offset': str(offset)
 	}
 	r = requests.get(PAGER_DUTY_API, headers=headers, params=params)
+
+	if r.status_code in [400, 404]:
+		raise Exception('Access to pagerduty api denied')
+
 	return r.json()['incidents']
 
 def fetch_all_incidents(
