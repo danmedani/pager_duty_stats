@@ -8,7 +8,7 @@ import copy
 from typing_extensions import TypedDict
 import json
 
-from pager_duty_stats.pager_duty_client import fetch_all_incidents
+from pager_duty_stats.logic.pager_duty_client import fetch_all_incidents
 
 class GroupingWindow(Enum):
 	DAY = 'day'

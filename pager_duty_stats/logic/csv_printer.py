@@ -1,8 +1,8 @@
 from typing import Dict
 from datetime import datetime
 from datetime import timedelta
-from pager_duty_stats.aggregation import AggregrateStats
-from pager_duty_stats.aggregation import get_earlist_date
+from pager_duty_stats.logic.aggregation import AggregrateStats
+from pager_duty_stats.logic.aggregation import get_earlist_date
 
 def print_stats(
 	date_col: str,
