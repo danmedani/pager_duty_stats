@@ -4,7 +4,7 @@ from datetime import timedelta
 from pager_duty_stats.logic.aggregation import AggregrateStats
 from pager_duty_stats.logic.aggregation import get_earlist_date
 
-def print_stats(
+def print_statistics(
 	date_col: str,
 	stats: Dict[str, AggregrateStats]
 ) -> None:

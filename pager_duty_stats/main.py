@@ -4,13 +4,11 @@ import sys
 from datetime import datetime
 from pager_duty_stats.logic.pager_duty_client import fetch_all_incidents
 from pager_duty_stats.logic.aggregation import get_stats
-from pager_duty_stats.logic.csv_printer import print_stats
+from pager_duty_stats.logic.csv_printer import print_statistics
 from pager_duty_stats.logic.aggregation import GroupingWindow
 from pager_duty_stats.logic.incident_types import ExtractionTechnique
 from argparse import Namespace
 
-
-DEFAULT_START_DATE = '2010-01-01'
 
 def get_pager_duty_api_key(file_name: str) -> str:
 	with open(file_name, 'r') as file:
@@ -21,7 +19,7 @@ def parse_args() -> Namespace:
 	
 	parser.add_argument('--pd-key-file', default='.api_key', help='File containing API Key to access api.pagerduty.com (default .api_key)')
 	parser.add_argument('--service_ids', required=True, type=str, nargs='+', help='PD service ids to collect stats on')
-	parser.add_argument('--start-date', default=DEFAULT_START_DATE, required=True, help='Date to collect alerts from (YYYY-MM-DD)')
+	parser.add_argument('--start-date', required=True, help='Date to collect alerts from (YYYY-MM-DD)')
 	parser.add_argument('--end-date', default=str(datetime.now().date()), help='Date to collect alerts until (YYYY-MM-DD) (default: todays date)')
 	parser.add_argument('--grouping-window', default=GroupingWindow.WEEK, type=GroupingWindow, choices=list(GroupingWindow), help='Group alerts by day, or by week? If by week, this only collects complete weeks (from Monday -> Sunday)')
 	
@@ -44,7 +42,7 @@ if __name__ == "__main__":
 		end_date=options.end_date
 	)
 
-	print_stats(
+	print_statistics(
 		date_col=str(options.grouping_window).capitalize(),
 		stats=get_stats(
 			incidents=incidents,

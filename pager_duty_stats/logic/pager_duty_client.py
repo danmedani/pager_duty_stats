@@ -5,6 +5,11 @@ from datetime import datetime
 from typing import Dict
 from typing import List
 
+"""
+Useful reference: https://developer.pagerduty.com/api-reference/
+
+"""
+
 PAGER_DUTY_API = 'https://api.pagerduty.com/incidents'
 FETCH_LIMIT = 100
 
