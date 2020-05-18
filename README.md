@@ -12,23 +12,24 @@ I usually just pipe the output into a file and import it into google sheets to g
 
 # API Token
 1. Generate an api token from PagerDuty (My Profile -> User Settings -> Create API User Token)
-2. Stick it in a file in the main directory of this repo called `.api_key` (this is the default place it's looked for - feel free to put it where-ever and specify the path with a `--pd-key-file` option).
+2. Stick it in a file in the main directory of this repo called `.api_key` (this is the default place it's looked for - feel free to put it whereever and specify the path with a `--pd-key-file` option).
 
 # Building
-1. make build
-2. source virtual_env/bin/activate (todo: can this be done from the Makefile?)
+1. `make build`
+2. `source virtual_env/bin/activate` (todo: can this be done from the Makefile?)
 
 # Testing (need to be in virtual env)
-make test
+1. `make test`
 
 # Fetching & Aggregating Stats (outputs tab-seperated csv)
 
-Some examples:
+After running `source virtual_env/bin/activate`, here's some examples of what you can do:
+
 ```
-python -m pager_duty_stats.main --include-time-of-day-counts --service_ids X289YKV L289YK3 --start-date 2020-01-01 > output.csv
+python -m pager_duty_stats.main --include-time-of-day-counts --service_ids X289YKV L289YK3 --start-date 2020-01-01
 
 
-python -m pager_duty_stats.main --pd-key-file ~/keys/pd_key.secret --service_ids X289YKV --start-date 2019-01-01 --end-date 2020-01-01 --grouping-window week > output.csv
+python -m pager_duty_stats.main --pd-key-file ~/.keys/pd_key --service_ids X289YKV --start-date 2019-01-01 --end-date 2020-01-01 --grouping-window week > output.csv
 
 
 python -m pager_duty_stats.main --service_ids X289YKV --start-date 2019-01-01 --grouping-window day --include-incident-types --max-incident-types 3 --incident-type-extraction-technique title > output.csv
