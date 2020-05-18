@@ -5,7 +5,7 @@ from pager_duty_stats.aggregation import AggregrateStats
 from pager_duty_stats.aggregation import get_earlist_date
 
 def print_stats(
-	date_col: str, 
+	date_col: str,
 	stats: Dict[str, AggregrateStats]
 ) -> None:
 

@@ -1,5 +1,6 @@
 import requests
 from typing import Optional
+from datetime import timedelta
 from datetime import datetime
 from typing import Dict
 from typing import List
@@ -39,13 +40,16 @@ def fetch_all_incidents(
 ) -> List[Dict]:
 	all_incidents = []
 
+	# pagerduty api defaults to exclusive end-date (it uses midnight). add a day to compensate
+	end_date_plus_one = str((datetime.strptime(end_date, '%Y-%m-%d') + timedelta(days=1)).date())
+
 	offset = 0
 	while True:
 		incidents = fetch_incident_chunk(
 			pd_api_key=pd_api_key,
 			service_ids=service_ids,
 			start_date=start_date,
-			end_date=end_date,
+			end_date=end_date_plus_one,
 			limit=FETCH_LIMIT,
 			offset=offset
 		)

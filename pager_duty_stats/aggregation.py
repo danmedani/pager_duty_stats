@@ -66,7 +66,12 @@ def classify_incident_time(time: datetime) -> IncidentTime:
 	return IncidentTime.WORK if time.hour < 18 else IncidentTime.LEISURE
 
 
-def get_stats_by_day(incidents: List[Dict], max_count_types: int) -> Dict[str, AggregrateStats]:
+def get_stats_by_day(
+	incidents: List[Dict], 
+	max_count_types: int,
+	start_date: str,
+	end_date: str
+) -> Dict[str, AggregrateStats]:
 	incidents_by_day = {}
 
 	for incident in incidents:
@@ -96,32 +101,51 @@ def get_stats_by_day(incidents: List[Dict], max_count_types: int) -> Dict[str, A
 			incidents_by_day[create_date]['error_type_counts'][incident_type] = 0
 		incidents_by_day[create_date]['error_type_counts'][incident_type] += 1
 
-	return clean_error_type_counts(incidents_by_day, max_count_types)
+	return clean_error_type_counts(
+		fill_out_empty_days(
+			incidents_by_day, 
+			start_date, 
+			end_date
+		), max_count_types
+	)
 
 def get_stats(
 	incidents: List[Dict],
+	start_date: str,
+	end_date: str,
 	max_count_types: int,
 	grouping_window: GroupingWindow
 ):
+	stats_by_day = get_stats_by_day(
+		incidents,
+		max_count_types,
+		start_date,
+		end_date
+	)
+
 	if grouping_window == GroupingWindow.WEEK:
-		return get_stats_by_week(incidents, max_count_types)
+		return convert_day_stats_to_week_stats(stats_by_day)
 	
 	if grouping_window == GroupingWindow.DAY:
-		return get_stats_by_day(incidents, max_count_types)
+		return stats_by_day
 
 	raise Exception('Grouping Window {} not recognized'.format(grouping_window))
 
 
-def get_stats_by_week(
-	incidents: List[Dict], 
-	max_count_types: int
+def fill_out_empty_days(
+	stats: Dict[str, AggregrateStats],
+	start_date: str,
+	end_date: str
 ) -> Dict[str, AggregrateStats]:
-	return convert_day_stats_to_week_stats(
-		get_stats_by_day(
-			incidents,
-			max_count_types
-		)
-	)
+	current_date = datetime.strptime(start_date, '%Y-%m-%d')
+	end_date = datetime.strptime(end_date, '%Y-%m-%d')
+
+	while current_date <= end_date:
+		date_str = str(current_date.date())
+		if date_str not in stats:
+			stats[date_str] = get_fresh_aggregate_stats()
+		current_date += timedelta(days=1)
+	return stats
 
 def get_earlist_date(dates: List[str]) -> str:
 	earliest_date = str(datetime.now().date())
