@@ -7,7 +7,6 @@ from typing import List
 
 """
 Useful reference: https://developer.pagerduty.com/api-reference/
-
 """
 
 PAGER_DUTY_API = 'https://api.pagerduty.com/incidents'
@@ -49,7 +48,7 @@ def fetch_all_incidents(
 ) -> List[Dict]:
 	all_incidents = []
 
-	# pagerduty api defaults to exclusive end-date (it uses midnight). add a day to compensate
+	# pagerduty api defaults to exclusive end-date (it uses 00:00 of the date). add a day to compensate
 	end_date_plus_one = str((datetime.strptime(end_date, '%Y-%m-%d') + timedelta(days=1)).date())
 
 	offset = 0
