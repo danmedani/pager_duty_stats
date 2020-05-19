@@ -35,9 +35,11 @@ def fetch_incident_chunk(
 	}
 	r = requests.get(PAGER_DUTY_API, headers=headers, params=params)
 
-	if r.status_code in [400, 404]:
-		raise Exception('Access to pagerduty api denied')
-
+	if r.status_code == 400:
+		raise Exception('400 from PagerDuty. Make sure you have legit service_ids specified')
+	if r.status_code == 404:
+		raise Exception('404 from PagerDuty. Double check your api key')
+	
 	return r.json()['incidents']
 
 def fetch_all_incidents(
