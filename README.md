@@ -1,6 +1,7 @@
 # pager_duty_stats
 Gathers and aggregates PagerDuty incident statistics and outputs tab-separated csv. 
 
+
 ## Main feature:
 1. Ability to aggregate incident counts by day or by week across a date range for a set of services. See `--start-date` and `--end-date` for the time range, `--grouping-window` for aggregation bucket type, and `--service_ids` for which PagerDuty services you want to collect stats for.
 
@@ -9,6 +10,15 @@ Gathers and aggregates PagerDuty incident statistics and outputs tab-separated c
 2. Can include groupings of the most common incident types that are happening, and a way of customizing how incidents are classified. See `--include-incident-types`, `--max-incident-types`, and `--incident-type-extraction-technique`.
 
 I usually just pipe the output into a csv file and import it into google sheets to get some nice visuals. The stacked column chart is really good for this type of data.
+
+
+# Screenshots
+![Image of Pages Per Week, With Type](https://i.ibb.co/4WbPTYk/Screen-Shot-2020-05-18-at-9-46-31-PM.png)
+
+![Image of Pages Per Day, Comparison](https://i.ibb.co/RHbJg1v/Screen-Shot-2020-05-18-at-9-50-32-PM.png)
+
+![Image of Pages Per Week, With Page Time](https://i.ibb.co/rdc08sC/Screen-Shot-2020-05-18-at-9-41-56-PM.png)
+
 
 
 # API Token
