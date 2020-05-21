@@ -12,7 +12,7 @@ from typing_extensions import TypedDict
 import json
 
 from pager_duty_stats.logic.pager_duty_client import fetch_all_incidents
-from pager_duty_stats.logic.incident_types import extract_incidient_type
+from pager_duty_stats.logic.incident_types import extract_incident_type
 from pager_duty_stats.logic.incident_types import ExtractionTechnique
 
 class GroupingWindow(Enum):
@@ -85,7 +85,7 @@ def extract_aggregation_value(
 		)
 	
 	if aggregation_group == AggregationType.CUSTOM_INCIDENT_TYPE:
-		return extract_incidient_type(
+		return extract_incident_type(
 			incident,
 			incident_type_extraction_technique
 		)

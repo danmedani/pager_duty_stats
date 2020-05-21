@@ -9,7 +9,7 @@ class ExtractionTechnique(Enum):
 	def __str__(self):
 		return self.value
 
-def extract_incidient_type(
+def extract_incident_type(
 	incident: Dict,
 	extraction_technique: ExtractionTechnique
 ) -> str:
