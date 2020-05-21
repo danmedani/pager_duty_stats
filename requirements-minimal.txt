@@ -3,3 +3,4 @@ typing_extensions
 mypy
 pytest
 argparse
+coverage

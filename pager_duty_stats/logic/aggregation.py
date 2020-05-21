@@ -15,6 +15,8 @@ from pager_duty_stats.logic.pager_duty_client import fetch_all_incidents
 from pager_duty_stats.logic.incident_types import extract_incident_type
 from pager_duty_stats.logic.incident_types import ExtractionTechnique
 
+MISCELLANEOUS = 'miscellaneous'
+
 class GroupingWindow(Enum):
 	DAY = 'day'
 	WEEK = 'week'
@@ -258,11 +260,9 @@ def clean_error_type_counts(
 		new_stats[day] = copy.deepcopy(stats[day])
 		for error_type, _ in stats[day]['aggregations'][AggregationType.CUSTOM_INCIDENT_TYPE].items():
 			if error_type not in stats_to_keep:
-				if 'Miscellaneous' not in new_stats[day]['aggregations'][AggregationType.CUSTOM_INCIDENT_TYPE]:
-					new_stats[day]['aggregations'][AggregationType.CUSTOM_INCIDENT_TYPE]['Miscellaneous'] = 0
-				new_stats[day]['aggregations'][AggregationType.CUSTOM_INCIDENT_TYPE]['Miscellaneous'] += stats[day]['aggregations'][AggregationType.CUSTOM_INCIDENT_TYPE][error_type]
+				if MISCELLANEOUS not in new_stats[day]['aggregations'][AggregationType.CUSTOM_INCIDENT_TYPE]:
+					new_stats[day]['aggregations'][AggregationType.CUSTOM_INCIDENT_TYPE][MISCELLANEOUS] = 0
+				new_stats[day]['aggregations'][AggregationType.CUSTOM_INCIDENT_TYPE][MISCELLANEOUS] += stats[day]['aggregations'][AggregationType.CUSTOM_INCIDENT_TYPE][error_type]
 				del new_stats[day]['aggregations'][AggregationType.CUSTOM_INCIDENT_TYPE][error_type]
 
 	return new_stats
-
-

@@ -23,5 +23,5 @@ mypy:
 
 .PHONY: test
 test: build mypy
-	pytest tests
-
+	coverage run --source pager_duty_stats -m pytest tests
+	coverage report -m
