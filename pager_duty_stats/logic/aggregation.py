@@ -49,12 +49,12 @@ def get_local_datetime(iso_date: str):
 	return datetime.strptime(iso_date, '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc).astimezone(tz=None)
 
 
-def get_fresh_aggregate_stats(aggregation_groups: List[AggregationType]) -> AggregrateStats:
+def get_fresh_aggregate_stats(aggregation_types: List[AggregationType]) -> AggregrateStats:
 	return AggregrateStats(
 		total_pages=0,
 		aggregations={
-			aggregation_group: defaultdict(int)
-			for aggregation_group in aggregation_groups
+			aggregation_type: defaultdict(int)
+			for aggregation_type in aggregation_types
 		}
 	)
 
@@ -75,13 +75,13 @@ def classify_incident_time(time: datetime) -> IncidentTime:
 
 def extract_aggregation_value(
 	incident: Dict, 
-	aggregation_group: AggregationType,
+	aggregation_type: AggregationType,
 	incident_type_extraction_technique: ExtractionTechnique
 ) -> str:
-	if aggregation_group == AggregationType.SERVICE_NAME:
+	if aggregation_type == AggregationType.SERVICE_NAME:
 		return incident['service']['summary']
 	
-	if aggregation_group == AggregationType.TIME_OF_DAY:
+	if aggregation_type == AggregationType.TIME_OF_DAY:
 		return str(
 			classify_incident_time(
 				get_local_datetime(
@@ -90,20 +90,20 @@ def extract_aggregation_value(
 			)
 		)
 	
-	if aggregation_group == AggregationType.CUSTOM_INCIDENT_TYPE:
+	if aggregation_type == AggregationType.CUSTOM_INCIDENT_TYPE:
 		return extract_incident_type(
 			incident,
 			incident_type_extraction_technique
 		)
 	
-	raise Exception('Aggregation group {} not supported!'.format(aggregation_group))
+	raise Exception('Aggregation group {} not supported!'.format(aggregation_type))
 
 
 def get_stats_by_day(
 	incidents: List[Dict],
 	start_date: str,
 	end_date: str,
-	aggregation_groups: List[AggregationType],
+	aggregation_types: List[AggregationType],
 	max_incident_types: int,
 	incident_type_extraction_technique: ExtractionTechnique
 ) -> Dict[str, AggregrateStats]:
@@ -113,15 +113,15 @@ def get_stats_by_day(
 		create_date_time = get_local_datetime(incident['created_at'])
 		create_date = str(create_date_time.date())
 		if create_date not in incidents_by_day:
-			incidents_by_day[create_date] = get_fresh_aggregate_stats(aggregation_groups)
+			incidents_by_day[create_date] = get_fresh_aggregate_stats(aggregation_types)
 		
 		incidents_by_day[create_date]['total_pages'] += 1
 
-		for aggregation_group in aggregation_groups:
-			incidents_by_day[create_date]['aggregations'][aggregation_group][
+		for aggregation_type in aggregation_types:
+			incidents_by_day[create_date]['aggregations'][aggregation_type][
 				extract_aggregation_value(
 					incident, 
-					aggregation_group,
+					aggregation_type,
 					incident_type_extraction_technique
 				)
 			] += 1
@@ -130,14 +130,14 @@ def get_stats_by_day(
 		incidents_by_day,
 		start_date, 
 		end_date,
-		aggregation_groups
+		aggregation_types
 	)
 
-	if AggregationType.CUSTOM_INCIDENT_TYPE in aggregation_groups:
+	if AggregationType.CUSTOM_INCIDENT_TYPE in aggregation_types:
 		return clean_error_type_counts(
 			filled_out_stats, 
 			max_incident_types,
-			aggregation_groups
+			aggregation_types
 		)
 	return filled_out_stats
 
@@ -147,7 +147,7 @@ def get_stats(
 	start_date: str,
 	end_date: str,
 	grouping_window: GroupingWindow,
-	aggregation_groups: List[AggregationType],
+	aggregation_types: List[AggregationType],
 	incident_type_extraction_technique: ExtractionTechnique,
 	max_incident_types: int
 ):
@@ -155,7 +155,7 @@ def get_stats(
 		incidents,
 		start_date,
 		end_date,
-		aggregation_groups,
+		aggregation_types,
 		max_incident_types,
 		incident_type_extraction_technique
 	)
@@ -164,7 +164,7 @@ def get_stats(
 		return convert_day_stats_to_week_stats(
 			stats_by_day, 
 			end_date,
-			aggregation_groups
+			aggregation_types
 		)
 	
 	if grouping_window == GroupingWindow.DAY:
@@ -177,7 +177,7 @@ def fill_out_empty_days(
 	stats: Dict[str, AggregrateStats],
 	start_date: str,
 	end_date: str,
-	aggregation_groups: List[AggregationType]
+	aggregation_types: List[AggregationType]
 ) -> Dict[str, AggregrateStats]:
 	current_date = datetime.strptime(start_date, '%Y-%m-%d')
 	last_date = datetime.strptime(end_date, '%Y-%m-%d')
@@ -185,7 +185,7 @@ def fill_out_empty_days(
 	while current_date <= last_date:
 		date_str = str(current_date.date())
 		if date_str not in stats:
-			stats[date_str] = get_fresh_aggregate_stats(aggregation_groups)
+			stats[date_str] = get_fresh_aggregate_stats(aggregation_types)
 		current_date += timedelta(days=1)
 	return stats
 
@@ -201,7 +201,7 @@ def get_earlist_date(dates: List[str]) -> str:
 def convert_day_stats_to_week_stats(
 	stats: Dict[str, AggregrateStats],
 	end_date: str,
-	aggregation_groups: List[AggregationType]
+	aggregation_types: List[AggregationType]
 ) -> Dict[str, AggregrateStats]:
 	earliest_date = get_earlist_date(list(stats.keys()))
 	
@@ -213,7 +213,7 @@ def convert_day_stats_to_week_stats(
 
 	last_date = datetime.strptime(end_date, '%Y-%m-%d')
 	week_stats: Dict[str, AggregrateStats] = {}
-	running_week_stats = get_fresh_aggregate_stats(aggregation_groups)
+	running_week_stats = get_fresh_aggregate_stats(aggregation_types)
 	start_of_week = None
 	while current_date <= last_date:
 		date_str = str(current_date.date())
@@ -222,15 +222,15 @@ def convert_day_stats_to_week_stats(
 			if start_of_week:
 				week_stats[start_of_week] = running_week_stats
 			
-			running_week_stats = get_fresh_aggregate_stats(aggregation_groups)
+			running_week_stats = get_fresh_aggregate_stats(aggregation_types)
 			start_of_week = date_str
 
 		if date_str in stats:
 			running_week_stats['total_pages'] += stats[date_str]['total_pages']
 
-			for aggregation_group in aggregation_groups:
-				for name, count in stats[date_str]['aggregations'][aggregation_group].items():
-					running_week_stats['aggregations'][aggregation_group][name] += count
+			for aggregation_type in aggregation_types:
+				for name, count in stats[date_str]['aggregations'][aggregation_type].items():
+					running_week_stats['aggregations'][aggregation_type][name] += count
 
 		current_date += timedelta(days=1)
 
@@ -240,7 +240,7 @@ def convert_day_stats_to_week_stats(
 def clean_error_type_counts(
 	stats: Dict[str, AggregrateStats],
 	max_incident_types: int,
-	aggregation_groups: List[AggregationType]
+	aggregation_types: List[AggregationType]
 ) -> Dict[str, AggregrateStats]:
 	# removes any errors that don't happen v often
 	total_error_type_counts = {}

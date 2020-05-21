@@ -56,7 +56,7 @@ def test_fill_out_empty_days():
 		},
 		start_date='2019-12-28',
 		end_date='2020-01-10',
-		aggregation_groups=[AggregationType.SERVICE_NAME, AggregationType.TIME_OF_DAY]
+		aggregation_types=[AggregationType.SERVICE_NAME, AggregationType.TIME_OF_DAY]
 	) == {
 		'2019-12-28': EMPTY_STATS,
 		'2019-12-29': EMPTY_STATS,
@@ -75,7 +75,7 @@ def test_fill_out_empty_days():
 	}
 
 
-def test_get_stats_by_day_no_aggregation_groups():
+def test_get_stats_by_day_no_aggregation_types():
 	assert get_stats_by_day(
 		incidents=[
 			{
@@ -93,7 +93,7 @@ def test_get_stats_by_day_no_aggregation_groups():
 		],
 		start_date='2020-05-17',
 		end_date='2020-05-20',
-		aggregation_groups=[],
+		aggregation_types=[],
 		max_incident_types=None,
 		incident_type_extraction_technique=None
 	) == {
@@ -138,7 +138,7 @@ def test_get_stats_by_day_with_per_service():
 		],
 		start_date='2020-05-17',
 		end_date='2020-05-20',
-		aggregation_groups=[AggregationType.SERVICE_NAME],
+		aggregation_types=[AggregationType.SERVICE_NAME],
 		max_incident_types=None,
 		incident_type_extraction_technique=None
 	) == {

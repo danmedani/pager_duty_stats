@@ -14,13 +14,13 @@ from pager_duty_stats.logic.aggregation import get_earlist_date
 def print_statistics(
 	date_col: str,
 	stats: Dict[str, AggregrateStats],
-	aggregation_groups: List[AggregationType]
+	aggregation_types: List[AggregationType]
 ) -> None:
 
 	# Header
-	all_aggregation_group_names: Dict[AggregationType, Set[str]] = {
-		aggregation_group: set()
-		for aggregation_group in aggregation_groups
+	all_aggregation_type_names: Dict[AggregationType, Set[str]] = {
+		aggregation_type: set()
+		for aggregation_type in aggregation_types
 	}
 
 	earliest_date = get_earlist_date(list(stats.keys()))
@@ -29,22 +29,22 @@ def print_statistics(
 		date_str = str(current_date.date())
 
 		if date_str in stats:
-			for aggregation_group in aggregation_groups:
-				for name, _ in stats[date_str]['aggregations'][aggregation_group].items():
-					all_aggregation_group_names[aggregation_group].add(name)
+			for aggregation_type in aggregation_types:
+				for name, _ in stats[date_str]['aggregations'][aggregation_type].items():
+					all_aggregation_type_names[aggregation_type].add(name)
 
 		current_date += timedelta(days=1)
 
 	fieldnames = [date_col, 'Total Pages']
 
-	all_aggregation_group_lists = {
-		aggregation_group: list(all_aggregation_group_names[aggregation_group])
-		for aggregation_group in aggregation_groups
+	all_aggregation_type_lists = {
+		aggregation_type: list(all_aggregation_type_names[aggregation_type])
+		for aggregation_type in aggregation_types
 	}
 	
-	for aggregation_group in aggregation_groups:
-		for aggregation_group_name in all_aggregation_group_lists[aggregation_group]:
-			fieldnames.append(aggregation_group_name)
+	for aggregation_type in aggregation_types:
+		for aggregation_type_name in all_aggregation_type_lists[aggregation_type]:
+			fieldnames.append(aggregation_type_name)
 
 	writer = csv.DictWriter(sys.stdout, fieldnames=fieldnames, delimiter='\t')
 	writer.writeheader()
@@ -59,9 +59,9 @@ def print_statistics(
 				'Total Pages': stats[date_str]['total_pages'],
 			}
 
-			for aggregation_group in aggregation_groups:
-				for aggregation_group_name in all_aggregation_group_lists[aggregation_group]:
-					row_dict[aggregation_group_name] = stats[date_str]['aggregations'][aggregation_group][aggregation_group_name]
+			for aggregation_type in aggregation_types:
+				for aggregation_type_name in all_aggregation_type_lists[aggregation_type]:
+					row_dict[aggregation_type_name] = stats[date_str]['aggregations'][aggregation_type][aggregation_type_name]
 
 			writer.writerow(row_dict)
 		current_date += timedelta(days=1)

@@ -33,16 +33,16 @@ def parse_args() -> Namespace:
 	
 	return parser.parse_args(sys.argv[1:])
 
-def fetch_aggregation_groups(options: Namespace) -> List[AggregationType]:
-	aggregation_groups = [AggregationType.SERVICE_NAME]
+def fetch_aggregation_types(options: Namespace) -> List[AggregationType]:
+	aggregation_types = [AggregationType.SERVICE_NAME]
 	if options.include_time_of_day_counts:
-		aggregation_groups.append(AggregationType.TIME_OF_DAY)
+		aggregation_types.append(AggregationType.TIME_OF_DAY)
 	if options.include_incident_types:
 		if not options.max_incident_types:
 			raise Exception('When using --include-incident-types, please include --max-incident-types')
-		aggregation_groups.append(AggregationType.CUSTOM_INCIDENT_TYPE)
+		aggregation_types.append(AggregationType.CUSTOM_INCIDENT_TYPE)
 	
-	return aggregation_groups
+	return aggregation_types
 
 if __name__ == "__main__":
 	options = parse_args()
@@ -54,7 +54,7 @@ if __name__ == "__main__":
 		end_date=options.end_date
 	)
 
-	aggregation_groups = fetch_aggregation_groups(options)
+	aggregation_types = fetch_aggregation_types(options)
 	print_statistics(
 		date_col=str(options.grouping_window).capitalize(),
 		stats=get_stats(
@@ -64,7 +64,7 @@ if __name__ == "__main__":
 			grouping_window=options.grouping_window,
 			incident_type_extraction_technique=options.incident_type_extraction_technique,
 			max_incident_types=options.max_incident_types,
-			aggregation_groups=aggregation_groups
+			aggregation_types=aggregation_types
 		),
-		aggregation_groups=aggregation_groups
+		aggregation_types=aggregation_types
 	)
