@@ -9,7 +9,7 @@ from typing_extensions import TypedDict
 import json
 
 from pager_duty_stats.logic.pager_duty_client import fetch_all_incidents
-from pager_duty_stats.logic.incident_types import extract_incidient_type
+from pager_duty_stats.logic.incident_types import extract_incident_type
 from pager_duty_stats.logic.incident_types import ExtractionTechnique
 
 class GroupingWindow(Enum):
@@ -91,7 +91,7 @@ def get_stats_by_day(
 			incidents_by_day[create_date]['per_time_of_day'][incident_time_str] += 1
 
 		if include_incident_types:
-			incident_type = extract_incidient_type(
+			incident_type = extract_incident_type(
 				incident,
 				incident_type_extraction_technique
 			)
