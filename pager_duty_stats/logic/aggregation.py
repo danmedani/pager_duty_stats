@@ -258,9 +258,9 @@ def clean_error_type_counts(
 		new_stats[day] = copy.deepcopy(stats[day])
 		for error_type, _ in stats[day]['aggregations'][AggregationType.CUSTOM_INCIDENT_TYPE].items():
 			if error_type not in stats_to_keep:
-				if 'misc' not in new_stats[day]['aggregations'][AggregationType.CUSTOM_INCIDENT_TYPE]:
-					new_stats[day]['aggregations'][AggregationType.CUSTOM_INCIDENT_TYPE]['misc'] = 0
-				new_stats[day]['aggregations'][AggregationType.CUSTOM_INCIDENT_TYPE]['misc'] += stats[day]['aggregations'][AggregationType.CUSTOM_INCIDENT_TYPE][error_type]
+				if 'Miscellaneous' not in new_stats[day]['aggregations'][AggregationType.CUSTOM_INCIDENT_TYPE]:
+					new_stats[day]['aggregations'][AggregationType.CUSTOM_INCIDENT_TYPE]['Miscellaneous'] = 0
+				new_stats[day]['aggregations'][AggregationType.CUSTOM_INCIDENT_TYPE]['Miscellaneous'] += stats[day]['aggregations'][AggregationType.CUSTOM_INCIDENT_TYPE][error_type]
 				del new_stats[day]['aggregations'][AggregationType.CUSTOM_INCIDENT_TYPE][error_type]
 
 	return new_stats
