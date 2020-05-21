@@ -8,8 +8,9 @@ from pager_duty_stats.logic.aggregation import AggregrateStats
 from pager_duty_stats.logic.aggregation import IncidentTime
 from pager_duty_stats.logic.aggregation import classify_incident_time
 from pager_duty_stats.logic.aggregation import get_stats_by_day
+from pager_duty_stats.logic.aggregation import AggregationType
 
-EMPTY_STATS = AggregrateStats(total_pages=0, aggregations={'per_service': defaultdict(int), 'per_time_of_day': defaultdict(int)})
+EMPTY_STATS = AggregrateStats(total_pages=0, aggregations={AggregationType.SERVICE_NAME: defaultdict(int), AggregationType.TIME_OF_DAY: defaultdict(int)})
 
 def test_is_mon_week_day():
 	assert is_week_day(datetime.strptime('2020-05-18', '%Y-%m-%d').replace(tzinfo=timezone.utc))
@@ -24,11 +25,11 @@ def test_fill_out_empty_days():
 	jan_5_stats = AggregrateStats(
 		total_pages=5,
 		aggregations={
-			'per_service': {
+			AggregationType.SERVICE_NAME: {
 				'service a': 2,
 				'service b': 3,
 			},
-			'per_time_of_day': {
+			AggregationType.TIME_OF_DAY: {
 				str(IncidentTime.WORK): 4,
 				str(IncidentTime.SLEEP): 1
 			},
@@ -37,11 +38,11 @@ def test_fill_out_empty_days():
 	jan_8_stats = AggregrateStats(
 			total_pages=10,
 			aggregations={
-				'per_service': {
+				AggregationType.SERVICE_NAME: {
 					'service a': 1,
 					'service b': 1,
 				},
-				'per_time_of_day': {
+				AggregationType.TIME_OF_DAY: {
 					str(IncidentTime.WORK): 2
 				},
 			}
@@ -55,7 +56,7 @@ def test_fill_out_empty_days():
 		},
 		start_date='2019-12-28',
 		end_date='2020-01-10',
-		aggregation_groups=['per_service', 'per_time_of_day']
+		aggregation_groups=[AggregationType.SERVICE_NAME, AggregationType.TIME_OF_DAY]
 	) == {
 		'2019-12-28': EMPTY_STATS,
 		'2019-12-29': EMPTY_STATS,
@@ -137,20 +138,20 @@ def test_get_stats_by_day_with_per_service():
 		],
 		start_date='2020-05-17',
 		end_date='2020-05-20',
-		aggregation_groups=['per_service'],
+		aggregation_groups=[AggregationType.SERVICE_NAME],
 		max_incident_types=None,
 		incident_type_extraction_technique=None
 	) == {
 		'2020-05-17': AggregrateStats(
 			total_pages=0, 
 			aggregations={
-				'per_service': {}
+				AggregationType.SERVICE_NAME: {}
 			}
 		),
 		'2020-05-18': AggregrateStats(
 			total_pages=1, 
 			aggregations={
-				'per_service': {
+				AggregationType.SERVICE_NAME: {
 					'service A': 1
 				}
 			}
@@ -158,7 +159,7 @@ def test_get_stats_by_day_with_per_service():
 		'2020-05-19': AggregrateStats(
 			total_pages=3, 
 			aggregations={
-				'per_service': {
+				AggregationType.SERVICE_NAME: {
 					'service A': 2,
 					'service B': 1
 				}
@@ -167,7 +168,7 @@ def test_get_stats_by_day_with_per_service():
 		'2020-05-20': AggregrateStats(
 			total_pages=1, 
 			aggregations={
-				'per_service': {
+				AggregationType.SERVICE_NAME: {
 					'service B': 1
 				}
 			}
