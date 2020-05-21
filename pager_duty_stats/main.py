@@ -20,7 +20,7 @@ def parse_args() -> Namespace:
 	parser = argparse.ArgumentParser(description='Aggregate PagerDuty stats & output a csv')
 	
 	parser.add_argument('--pd-key-file', default='.api_key', help='File containing API Key to access api.pagerduty.com (default .api_key)')
-	parser.add_argument('--service_ids', required=True, type=str, nargs='+', help='PD service ids to collect stats on')
+	parser.add_argument('--service-ids', required=True, type=str, nargs='+', help='PD service ids to collect stats on')
 	parser.add_argument('--start-date', required=True, help='Date to collect alerts from (YYYY-MM-DD)')
 	parser.add_argument('--end-date', default=str(datetime.now().date()), help='Date to collect alerts until (YYYY-MM-DD) (default: todays date)')
 	parser.add_argument('--grouping-window', default=GroupingWindow.WEEK, type=GroupingWindow, choices=list(GroupingWindow), help='Group alerts by day, or by week? If by week, this only collects complete weeks (from Monday -> Sunday)')

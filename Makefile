@@ -25,3 +25,9 @@ mypy:
 test: build mypy
 	coverage run --source pager_duty_stats -m pytest tests
 	coverage report -m
+
+# Not building beforehand makes things faster
+.PHONY: tst
+tst: mypy
+	coverage run --source pager_duty_stats -m pytest tests
+	coverage report -m

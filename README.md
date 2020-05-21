@@ -3,7 +3,7 @@ Gathers and aggregates PagerDuty incident statistics and outputs tab-separated c
 
 
 ## Main feature:
-1. Ability to aggregate incident counts by day or by week across a date range for a set of services. See `--start-date` and `--end-date` for the time range, `--grouping-window` for aggregation bucket type, and `--service_ids` for which PagerDuty services you want to collect stats for.
+1. Ability to aggregate incident counts by day or by week across a date range for a set of services. See `--start-date` and `--end-date` for the time range, `--grouping-window` for aggregation bucket type, and `--service-ids` for which PagerDuty services you want to collect stats for.
 
 ## Other features:
 1. Can include a break-down of when pages are happening (during work hours, off hours, or sleep hours). See `--include-time-of-day-counts`.
@@ -44,7 +44,7 @@ I usually just pipe the output into a csv file and import it into google sheets 
 python -m pager_duty_stats.main \
 	--pd-key-file .api_key \
 	--grouping-window day \
-	--service_ids G289YKF R289YKF \
+	--service-ids G289YKF R289YKF \
 	--start-date 2020-01-01 \
 	--end-date 2020-04-01 \
 	--include-time-of-day-counts \
