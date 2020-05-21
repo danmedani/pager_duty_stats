@@ -30,7 +30,7 @@ class AggregationType(Enum):
 
 class AggregrateStats(TypedDict):
 	total_pages: int
-	aggregations: Dict[str, DefaultDict[str, int]]
+	aggregations: Dict[AggregationType, DefaultDict[str, int]]
 
 
 class IncidentTime(Enum):
@@ -45,7 +45,7 @@ class IncidentTime(Enum):
 def get_local_datetime(iso_date: str):
 	return datetime.strptime(iso_date, '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc).astimezone(tz=None)
 
-def get_fresh_aggregate_stats(aggregation_groups: List[str]) -> AggregrateStats:
+def get_fresh_aggregate_stats(aggregation_groups: List[AggregationType]) -> AggregrateStats:
 	return AggregrateStats(
 		total_pages=0,
 		aggregations={
@@ -69,7 +69,7 @@ def classify_incident_time(time: datetime) -> IncidentTime:
 
 def extract_aggregation_value(
 	incident: Dict, 
-	aggregation_group: str,
+	aggregation_group: AggregationType,
 	incident_type_extraction_technique: ExtractionTechnique
 ) -> str:
 	if aggregation_group == AggregationType.SERVICE_NAME:
@@ -89,15 +89,17 @@ def extract_aggregation_value(
 			incident,
 			incident_type_extraction_technique
 		)
+	
+	raise Exception('Aggregation group {} not supported!'.format(aggregation_group))
 
 
 def get_stats_by_day(
 	incidents: List[Dict],
 	start_date: str,
 	end_date: str,
-	aggregation_groups: List[str],
-	max_incident_types: Optional[int],
-	incident_type_extraction_technique: Optional[ExtractionTechnique]
+	aggregation_groups: List[AggregationType],
+	max_incident_types: int,
+	incident_type_extraction_technique: ExtractionTechnique
 ) -> Dict[str, AggregrateStats]:
 	incidents_by_day: Dict[str, AggregrateStats] = {}
 
@@ -138,7 +140,7 @@ def get_stats(
 	start_date: str,
 	end_date: str,
 	grouping_window: GroupingWindow,
-	aggregation_groups: List[str],
+	aggregation_groups: List[AggregationType],
 	incident_type_extraction_technique: ExtractionTechnique,
 	max_incident_types: int
 ):
@@ -168,7 +170,7 @@ def fill_out_empty_days(
 	stats: Dict[str, AggregrateStats],
 	start_date: str,
 	end_date: str,
-	aggregation_groups: List[str]
+	aggregation_groups: List[AggregationType]
 ) -> Dict[str, AggregrateStats]:
 	current_date = datetime.strptime(start_date, '%Y-%m-%d')
 	last_date = datetime.strptime(end_date, '%Y-%m-%d')
@@ -192,7 +194,7 @@ def get_earlist_date(dates: List[str]) -> str:
 def convert_day_stats_to_week_stats(
 	stats: Dict[str, AggregrateStats],
 	end_date: str,
-	aggregation_groups: List[str]
+	aggregation_groups: List[AggregationType]
 ) -> Dict[str, AggregrateStats]:
 	earliest_date = get_earlist_date(list(stats.keys()))
 	
@@ -231,7 +233,7 @@ def convert_day_stats_to_week_stats(
 def clean_error_type_counts(
 	stats: Dict[str, AggregrateStats],
 	max_incident_types: int,
-	aggregation_groups: List[str]
+	aggregation_groups: List[AggregationType]
 ) -> Dict[str, AggregrateStats]:
 	# removes any errors that don't happen v often
 	total_error_type_counts = {}

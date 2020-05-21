@@ -3,24 +3,22 @@ import sys
 import json
 from typing import List
 from typing import Dict
+from typing import Set
 from datetime import datetime
 from datetime import timedelta
 from pager_duty_stats.logic.aggregation import AggregrateStats
+from pager_duty_stats.logic.aggregation import AggregationType
 from pager_duty_stats.logic.aggregation import get_earlist_date
 
 
 def print_statistics(
 	date_col: str,
 	stats: Dict[str, AggregrateStats],
-	aggregation_groups: List[str]
+	aggregation_groups: List[AggregationType]
 ) -> None:
 
 	# Header
-	all_incident_types_set = set()
-	all_services_set = set()
-	all_times_of_day_set = set()
-
-	all_aggregation_group_names = {
+	all_aggregation_group_names: Dict[AggregationType, Set[str]] = {
 		aggregation_group: set()
 		for aggregation_group in aggregation_groups
 	}
