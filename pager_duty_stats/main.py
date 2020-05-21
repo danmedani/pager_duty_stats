@@ -2,10 +2,12 @@ import argparse
 import sys
 
 from datetime import datetime
+from typing import List
 from pager_duty_stats.logic.pager_duty_client import fetch_all_incidents
 from pager_duty_stats.logic.aggregation import get_stats
 from pager_duty_stats.logic.csv_printer import print_statistics
 from pager_duty_stats.logic.aggregation import GroupingWindow
+from pager_duty_stats.logic.aggregation import AggregationType
 from pager_duty_stats.logic.incident_types import ExtractionTechnique
 from argparse import Namespace
 
@@ -31,6 +33,14 @@ def parse_args() -> Namespace:
 	
 	return parser.parse_args(sys.argv[1:])
 
+def fetch_aggregation_groups(options: Namespace) -> List[AggregationType]:
+	aggregation_groups = [AggregationType.SERVICE_NAME]
+	if options.include_time_of_day_counts:
+		aggregation_groups.append(AggregationType.TIME_OF_DAY)
+	if options.include_incident_types:
+		aggregation_groups.append(AggregationType.CUSTOM_INCIDENT_TYPE)
+	
+	return aggregation_groups
 
 if __name__ == "__main__":
 	options = parse_args()
@@ -41,8 +51,8 @@ if __name__ == "__main__":
 		start_date=options.start_date,
 		end_date=options.end_date
 	)
-	print(incidents[0])
 
+	aggregation_groups = fetch_aggregation_groups(options)
 	print_statistics(
 		date_col=str(options.grouping_window).capitalize(),
 		stats=get_stats(
@@ -52,7 +62,7 @@ if __name__ == "__main__":
 			grouping_window=options.grouping_window,
 			incident_type_extraction_technique=options.incident_type_extraction_technique,
 			max_incident_types=options.max_incident_types,
-			aggregation_groups=['per_service', 'per_time_of_day']
-		)
+			aggregation_groups=aggregation_groups
+		),
+		aggregation_groups=aggregation_groups
 	)
-

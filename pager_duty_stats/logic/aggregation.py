@@ -23,6 +23,10 @@ class GroupingWindow(Enum):
 	def __str__(self):
 		return self.value
 
+class AggregationType(Enum):
+	SERVICE_NAME = 'service_name'
+	TIME_OF_DAY = 'time_of_day'
+	CUSTOM_INCIDENT_TYPE = 'custom_incident_type'
 
 class AggregrateStats(TypedDict):
 	total_pages: int
@@ -68,10 +72,10 @@ def extract_aggregation_value(
 	aggregation_group: str,
 	incident_type_extraction_technique: ExtractionTechnique
 ) -> str:
-	if aggregation_group == 'per_service':
+	if aggregation_group == AggregationType.SERVICE_NAME:
 		return incident['service']['summary']
 	
-	if aggregation_group == 'per_time_of_day':
+	if aggregation_group == AggregationType.TIME_OF_DAY:
 		return str(
 			classify_incident_time(
 				get_local_datetime(
@@ -80,7 +84,7 @@ def extract_aggregation_value(
 			)
 		)
 	
-	if aggregation_group == 'incident_type':
+	if aggregation_group == AggregationType.CUSTOM_INCIDENT_TYPE:
 		return extract_incidient_type(
 			incident,
 			incident_type_extraction_technique
@@ -121,7 +125,7 @@ def get_stats_by_day(
 		aggregation_groups
 	)
 
-	if 'custom_incident_type' in aggregation_groups:
+	if AggregationType.CUSTOM_INCIDENT_TYPE in aggregation_groups:
 		return clean_error_type_counts(
 			filled_out_stats, 
 			max_incident_types,
@@ -216,8 +220,8 @@ def convert_day_stats_to_week_stats(
 			running_week_stats['total_pages'] += stats[date_str]['total_pages']
 
 			for aggregation_group in aggregation_groups:
-				for name, count in stats[date_str][aggregation_group].items():
-					running_week_stats[name] += count
+				for name, count in stats[date_str]['aggregations'][aggregation_group].items():
+					running_week_stats['aggregations'][aggregation_group][name] += count
 
 		current_date += timedelta(days=1)
 
@@ -232,7 +236,7 @@ def clean_error_type_counts(
 	# removes any errors that don't happen v often
 	total_error_type_counts = {}
 	for _, day_stats in stats.items():
-		for error_type, error_type_count in day_stats['error_type_counts'].items():
+		for error_type, error_type_count in day_stats['aggregations'][AggregationType.CUSTOM_INCIDENT_TYPE].items():
 			if error_type not in total_error_type_counts:
 				total_error_type_counts[error_type] = 0
 			total_error_type_counts[error_type] += error_type_count
@@ -250,12 +254,12 @@ def clean_error_type_counts(
 	new_stats = {}
 	for day, _ in stats.items():
 		new_stats[day] = copy.deepcopy(stats[day])
-		for error_type, _ in stats[day]['error_type_counts'].items():
+		for error_type, _ in stats[day]['aggregations'][AggregationType.CUSTOM_INCIDENT_TYPE].items():
 			if error_type not in stats_to_keep:
-				if 'misc' not in new_stats[day]['error_type_counts']:
-					new_stats[day]['error_type_counts']['misc'] = 0
-				new_stats[day]['error_type_counts']['misc'] += stats[day]['error_type_counts'][error_type]
-				del new_stats[day]['error_type_counts'][error_type]
+				if 'misc' not in new_stats[day]['aggregations'][AggregationType.CUSTOM_INCIDENT_TYPE]:
+					new_stats[day]['aggregations'][AggregationType.CUSTOM_INCIDENT_TYPE]['misc'] = 0
+				new_stats[day]['aggregations'][AggregationType.CUSTOM_INCIDENT_TYPE]['misc'] += stats[day]['aggregations'][AggregationType.CUSTOM_INCIDENT_TYPE][error_type]
+				del new_stats[day]['aggregations'][AggregationType.CUSTOM_INCIDENT_TYPE][error_type]
 
 	return new_stats
 
