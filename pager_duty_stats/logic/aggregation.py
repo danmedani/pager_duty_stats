@@ -44,8 +44,10 @@ class IncidentTime(Enum):
 	def __str__(self):
 		return self.value
 
+
 def get_local_datetime(iso_date: str):
 	return datetime.strptime(iso_date, '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc).astimezone(tz=None)
+
 
 def get_fresh_aggregate_stats(aggregation_groups: List[AggregationType]) -> AggregrateStats:
 	return AggregrateStats(
@@ -56,8 +58,10 @@ def get_fresh_aggregate_stats(aggregation_groups: List[AggregationType]) -> Aggr
 		}
 	)
 
+
 def is_week_day(time: datetime) -> bool:
 	return time.weekday() < 5
+
 
 def classify_incident_time(time: datetime) -> IncidentTime:
 	if time.hour < 8:
@@ -136,6 +140,7 @@ def get_stats_by_day(
 			aggregation_groups
 		)
 	return filled_out_stats
+
 
 def get_stats(
 	incidents: List[Dict],
