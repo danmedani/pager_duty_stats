@@ -84,11 +84,7 @@ def extract_aggregation_value(
 			)
 		)
 	
-<<<<<<< HEAD
 	if aggregation_group == AggregationType.CUSTOM_INCIDENT_TYPE:
-=======
-	if aggregation_group == 'custom_incident_type':
->>>>>>> 674804bea01db90f952adbd049036a41b6e3a29b
 		return extract_incidient_type(
 			incident,
 			incident_type_extraction_technique
