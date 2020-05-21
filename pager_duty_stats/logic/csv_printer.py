@@ -1,5 +1,7 @@
 import csv
 import sys
+import json
+from typing import List
 from typing import Dict
 from datetime import datetime
 from datetime import timedelta
@@ -30,7 +32,7 @@ def print_statistics(
 
 		if date_str in stats:
 			for aggregation_group in aggregation_groups:
-				for name, _ in stats[date_str][aggregation_group].items():
+				for name, _ in stats[date_str]['aggregations'][aggregation_group].items():
 					all_aggregation_group_names[aggregation_group].add(name)
 
 		current_date += timedelta(days=1)
@@ -41,7 +43,7 @@ def print_statistics(
 		aggregation_group: list(all_aggregation_group_names[aggregation_group])
 		for aggregation_group in aggregation_groups
 	}
-
+	
 	for aggregation_group in aggregation_groups:
 		for aggregation_group_name in all_aggregation_group_lists[aggregation_group]:
 			fieldnames.append(aggregation_group_name)
@@ -61,7 +63,7 @@ def print_statistics(
 
 			for aggregation_group in aggregation_groups:
 				for aggregation_group_name in all_aggregation_group_lists[aggregation_group]:
-					row_dict[aggregation_group] = stats[date_str][aggregation_group][aggregation_group_name]
+					row_dict[aggregation_group_name] = stats[date_str]['aggregations'][aggregation_group][aggregation_group_name]
 
 			writer.writerow(row_dict)
 		current_date += timedelta(days=1)

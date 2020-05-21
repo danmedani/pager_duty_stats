@@ -41,7 +41,6 @@ if __name__ == "__main__":
 		start_date=options.start_date,
 		end_date=options.end_date
 	)
-	print(incidents[0])
 
 	print_statistics(
 		date_col=str(options.grouping_window).capitalize(),
@@ -52,7 +51,8 @@ if __name__ == "__main__":
 			grouping_window=options.grouping_window,
 			incident_type_extraction_technique=options.incident_type_extraction_technique,
 			max_incident_types=options.max_incident_types,
-			aggregation_groups=['per_service', 'per_time_of_day']
-		)
+			aggregation_groups=['per_service', 'per_time_of_day', 'custom_incident_type']
+		),
+		aggregation_groups=['per_service', 'per_time_of_day', 'custom_incident_type']
 	)
 

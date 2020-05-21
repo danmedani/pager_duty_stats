@@ -80,7 +80,7 @@ def extract_aggregation_value(
 			)
 		)
 	
-	if aggregation_group == 'incident_type':
+	if aggregation_group == 'custom_incident_type':
 		return extract_incidient_type(
 			incident,
 			incident_type_extraction_technique
@@ -216,8 +216,8 @@ def convert_day_stats_to_week_stats(
 			running_week_stats['total_pages'] += stats[date_str]['total_pages']
 
 			for aggregation_group in aggregation_groups:
-				for name, count in stats[date_str][aggregation_group].items():
-					running_week_stats[name] += count
+				for name, count in stats[date_str]['aggregations'][aggregation_group].items():
+					running_week_stats['aggregations'][aggregation_group][name] += count
 
 		current_date += timedelta(days=1)
 
@@ -232,7 +232,7 @@ def clean_error_type_counts(
 	# removes any errors that don't happen v often
 	total_error_type_counts = {}
 	for _, day_stats in stats.items():
-		for error_type, error_type_count in day_stats['error_type_counts'].items():
+		for error_type, error_type_count in day_stats['aggregations']['custom_incident_type'].items():
 			if error_type not in total_error_type_counts:
 				total_error_type_counts[error_type] = 0
 			total_error_type_counts[error_type] += error_type_count
@@ -250,12 +250,12 @@ def clean_error_type_counts(
 	new_stats = {}
 	for day, _ in stats.items():
 		new_stats[day] = copy.deepcopy(stats[day])
-		for error_type, _ in stats[day]['error_type_counts'].items():
+		for error_type, _ in stats[day]['aggregations']['custom_incident_type'].items():
 			if error_type not in stats_to_keep:
-				if 'misc' not in new_stats[day]['error_type_counts']:
-					new_stats[day]['error_type_counts']['misc'] = 0
-				new_stats[day]['error_type_counts']['misc'] += stats[day]['error_type_counts'][error_type]
-				del new_stats[day]['error_type_counts'][error_type]
+				if 'misc' not in new_stats[day]['aggregations']['custom_incident_type']:
+					new_stats[day]['aggregations']['custom_incident_type']['misc'] = 0
+				new_stats[day]['aggregations']['custom_incident_type']['misc'] += stats[day]['aggregations']['custom_incident_type'][error_type]
+				del new_stats[day]['aggregations']['custom_incident_type'][error_type]
 
 	return new_stats
 
