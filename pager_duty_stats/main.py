@@ -2,10 +2,12 @@ import argparse
 import sys
 
 from datetime import datetime
+from typing import List
 from pager_duty_stats.logic.pager_duty_client import fetch_all_incidents
 from pager_duty_stats.logic.aggregation import get_stats
 from pager_duty_stats.logic.csv_printer import print_statistics
 from pager_duty_stats.logic.aggregation import GroupingWindow
+from pager_duty_stats.logic.aggregation import AggregationType
 from pager_duty_stats.logic.incident_types import ExtractionTechnique
 from argparse import Namespace
 
@@ -27,10 +29,20 @@ def parse_args() -> Namespace:
 
 	parser.add_argument('--include-incident-types', action='store_true', default=False, help='Includes breakdown of the types of errors that are happening')
 	parser.add_argument('--incident-type-extraction-technique', default=ExtractionTechnique.YC, type=ExtractionTechnique, choices=list(ExtractionTechnique), help='Technique for reducing/classifying incidents (for use with --include-incident-types). See pager_duty_stats.logic.incident_types for more details')
-	parser.add_argument('--max-incident-types', type=int, default=10, help='(For use with --include-incident-types): this determines how many of the most common incident types to show. (default: 10)')
+	parser.add_argument('--max-incident-types', type=int, help='(For use with --include-incident-types): this determines how many of the most common incident types to show. (default: 10)')
 	
 	return parser.parse_args(sys.argv[1:])
 
+def fetch_aggregation_groups(options: Namespace) -> List[AggregationType]:
+	aggregation_groups = [AggregationType.SERVICE_NAME]
+	if options.include_time_of_day_counts:
+		aggregation_groups.append(AggregationType.TIME_OF_DAY)
+	if options.include_incident_types:
+		if not options.max_incident_types:
+			raise Exception('When using --include-incident-types, please include --max-incident-types')
+		aggregation_groups.append(AggregationType.CUSTOM_INCIDENT_TYPE)
+	
+	return aggregation_groups
 
 if __name__ == "__main__":
 	options = parse_args()
@@ -42,6 +54,7 @@ if __name__ == "__main__":
 		end_date=options.end_date
 	)
 
+	aggregation_groups = fetch_aggregation_groups(options)
 	print_statistics(
 		date_col=str(options.grouping_window).capitalize(),
 		stats=get_stats(
@@ -49,10 +62,9 @@ if __name__ == "__main__":
 			start_date=options.start_date,
 			end_date=options.end_date,
 			grouping_window=options.grouping_window,
-			include_time_of_day_counts=options.include_time_of_day_counts,
-			include_incident_types=options.include_incident_types,
 			incident_type_extraction_technique=options.incident_type_extraction_technique,
-			max_incident_types=options.max_incident_types
-		)
+			max_incident_types=options.max_incident_types,
+			aggregation_groups=aggregation_groups
+		),
+		aggregation_groups=aggregation_groups
 	)
-

@@ -23,4 +23,3 @@ def extract_incident_type(
 		return title_parts[0]
 
 	raise Exception('ExtractionTechnique {} not implemented'.format(extraction_technique))
-
