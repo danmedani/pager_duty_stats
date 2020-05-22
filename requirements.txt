@@ -1,12 +1,18 @@
+Flask==1.1.2
+Jinja2==2.11.2
+MarkupSafe==1.1.1
+Werkzeug==1.0.1
 aspy.refactor-imports==2.1.1
 attrs==19.3.0
 cached-property==1.5.1
 certifi==2020.4.5.1
 chardet==3.0.4
+click==7.1.2
 coverage==5.1
 flake8==3.8.2
 idna==2.9
 importlib-metadata==1.6.0
+itsdangerous==1.1.0
 mccabe==0.6.1
 mock==4.0.2
 more-itertools==8.3.0
@@ -24,6 +30,7 @@ requests==2.23.0
 six==1.15.0
 typed-ast==1.4.1
 typing-extensions==3.7.4.2
+uWSGI==2.0.18
 urllib3==1.25.9
 wcwidth==0.1.9
 zipp==3.1.0
