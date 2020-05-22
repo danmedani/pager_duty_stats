@@ -35,6 +35,8 @@ def test_print_statistics_smoke_test(
     mock_stats
 ):
     print_statistics(
+        start_date='2020-01-01',
+        end_date='2020-01-02',
         grouping_window=GroupingWindow.WEEK,
         stats=mock_stats,
         aggregation_types=[AggregationType.SERVICE_NAME, AggregationType.TIME_OF_DAY]

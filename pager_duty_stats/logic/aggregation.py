@@ -10,6 +10,7 @@ from typing import Dict
 import copy
 from typing_extensions import TypedDict
 import json
+from pager_duty_stats.logic.util.dates import step_through_dates
 
 from pager_duty_stats.logic.pager_duty_client import fetch_all_incidents
 from pager_duty_stats.logic.incident_types import extract_incident_type
@@ -179,14 +180,10 @@ def fill_out_empty_days(
 	end_date: str,
 	aggregation_types: List[AggregationType]
 ) -> Dict[str, AggregrateStats]:
-	current_date = datetime.strptime(start_date, '%Y-%m-%d')
-	last_date = datetime.strptime(end_date, '%Y-%m-%d')
+	for date in step_through_dates(start_date, end_date):
+		if date not in stats:
+			stats[date] = get_fresh_aggregate_stats(aggregation_types)
 
-	while current_date <= last_date:
-		date_str = str(current_date.date())
-		if date_str not in stats:
-			stats[date_str] = get_fresh_aggregate_stats(aggregation_types)
-		current_date += timedelta(days=1)
 	return stats
 
 
@@ -198,41 +195,46 @@ def get_earlist_date(dates: List[str]) -> str:
 	return earliest_date
 
 
+def find_first_monday(date: str) -> str:
+	first_monday = datetime.strptime(date, '%Y-%m-%d')
+	while first_monday.weekday() > 0:
+		first_monday += timedelta(days=1)
+	return str(first_monday.date())
+
+
+def get_weekday(date: str) -> int:
+	return datetime.strptime(date, '%Y-%m-%d').weekday()
+
+
 def convert_day_stats_to_week_stats(
 	stats: Dict[str, AggregrateStats],
 	end_date: str,
 	aggregation_types: List[AggregationType]
 ) -> Dict[str, AggregrateStats]:
-	earliest_date = get_earlist_date(list(stats.keys()))
-	
-	current_date = datetime.strptime(earliest_date, '%Y-%m-%d')
-
-	# Skip to the first monday, ignore anything before then
-	while current_date.weekday() > 0:
-		current_date += timedelta(days=1)
-
-	last_date = datetime.strptime(end_date, '%Y-%m-%d')
 	week_stats: Dict[str, AggregrateStats] = {}
 	running_week_stats = get_fresh_aggregate_stats(aggregation_types)
 	start_of_week = None
-	while current_date <= last_date:
-		date_str = str(current_date.date())
-
-		if current_date.weekday() == 0:
+	
+	start_date = find_first_monday(
+		get_earlist_date(list(stats.keys()))
+	)
+	for date in step_through_dates(
+		start_date,
+		end_date
+	):
+		if get_weekday(date) == 0:
 			if start_of_week:
 				week_stats[start_of_week] = running_week_stats
 			
 			running_week_stats = get_fresh_aggregate_stats(aggregation_types)
-			start_of_week = date_str
+			start_of_week = date
 
-		if date_str in stats:
-			running_week_stats['total_pages'] += stats[date_str]['total_pages']
+		if date in stats:
+			running_week_stats['total_pages'] += stats[date]['total_pages']
 
 			for aggregation_type in aggregation_types:
-				for name, count in stats[date_str]['aggregations'][aggregation_type].items():
+				for name, count in stats[date]['aggregations'][aggregation_type].items():
 					running_week_stats['aggregations'][aggregation_type][name] += count
-
-		current_date += timedelta(days=1)
 
 	return week_stats
 

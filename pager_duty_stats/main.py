@@ -56,6 +56,8 @@ if __name__ == "__main__":
 
 	aggregation_types = fetch_aggregation_types(options)
 	print_statistics(
+		start_date=options.start_date,
+		end_date=options.end_date,
 		grouping_window=options.grouping_window,
 		stats=get_stats(
 			incidents=incidents,

@@ -10,7 +10,7 @@ from pager_duty_stats.logic.aggregation import AggregrateStats
 from pager_duty_stats.logic.aggregation import AggregationType
 from pager_duty_stats.logic.aggregation import get_earlist_date
 from pager_duty_stats.logic.aggregation import GroupingWindow
-
+from pager_duty_stats.logic.util.dates import step_through_dates
 
 def get_aggregation_type_values(
 	stats: Dict[str, AggregrateStats],
@@ -48,6 +48,8 @@ def get_header_fieldnames(
 
 
 def print_statistics(
+	start_date: str,
+	end_date: str,
 	grouping_window: GroupingWindow,
 	stats: Dict[str, AggregrateStats],
 	aggregation_types: List[AggregationType]
@@ -66,20 +68,15 @@ def print_statistics(
 	)
 	writer.writeheader()
 
-	earliest_date = get_earlist_date(list(stats.keys()))
-	current_date = datetime.strptime(earliest_date, '%Y-%m-%d')
-	while current_date <= datetime.now():
-		date_str = str(current_date.date())
-		if date_str in stats:
+	for date in step_through_dates(start_date, end_date):
+		if date in stats:
 			row_dict = {
-				output_date_col_name: date_str,
-				'Total Pages': stats[date_str]['total_pages'],
+				output_date_col_name: date,
+				'Total Pages': stats[date]['total_pages'],
 			}
 
 			for aggregation_type in aggregation_types:
 				for aggregation_type_name in aggregation_type_values[aggregation_type]:
-					row_dict[aggregation_type_name] = stats[date_str]['aggregations'][aggregation_type][aggregation_type_name]
+					row_dict[aggregation_type_name] = stats[date]['aggregations'][aggregation_type][aggregation_type_name]
 
 			writer.writerow(row_dict)
-		current_date += timedelta(days=1)
-
