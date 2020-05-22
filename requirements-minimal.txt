@@ -5,3 +5,5 @@ pytest
 argparse
 coverage
 mock
+uwsgi
+flask
