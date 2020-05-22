@@ -12,6 +12,12 @@ Useful reference: https://developer.pagerduty.com/api-reference/
 PAGER_DUTY_API = 'https://api.pagerduty.com/incidents'
 FETCH_LIMIT = 100
 
+class InvalidServiceException(Exception):
+	pass
+
+class InvalidApiKeyException(Exception):
+	pass
+
 def fetch_incident_chunk(
 	pd_api_key: str,
 	service_ids: List[str],
@@ -36,9 +42,9 @@ def fetch_incident_chunk(
 	r = requests.get(PAGER_DUTY_API, headers=headers, params=params)
 
 	if r.status_code == 400:
-		raise Exception('400 from PagerDuty. Make sure you have legit service_ids specified')
+		raise InvalidServiceException('400 from PagerDuty. Make sure you have legit service_ids specified')
 	if r.status_code == 404:
-		raise Exception('404 from PagerDuty. Double check your api key')
+		raise InvalidApiKeyException('404 from PagerDuty. Double check your api key')
 	
 	return r.json()['incidents']
 
