@@ -1,7 +1,7 @@
-from datetime import timedelta
 from datetime import datetime
-
+from datetime import timedelta
 from typing import Generator
+
 
 def step_through_dates(
     start_date: str,
