@@ -18,16 +18,23 @@ venv/bin/activate: requirements-minimal.txt
 
 .PHONY: mypy
 mypy:
-	. virtual_env/bin/activate ;\
+	@. virtual_env/bin/activate ;\
 	mypy pager_duty_stats
 
 .PHONY: test
-test: build mypy
+test: build lint mypy
 	coverage run --source pager_duty_stats -m pytest tests
 	coverage report -m
 
 # Not building beforehand makes things faster
 .PHONY: tst
-tst: mypy
+tst: lint mypy
 	coverage run --source pager_duty_stats -m pytest tests
 	coverage report -m
+
+.PHONY: lint
+lint: 
+	@echo "    ----    Re-ordering imports    ----    "
+	@find pager_duty_stats tests -name *.py -exec reorder-python-imports {} +
+	@echo "    ----    Running linter    ----    "
+	@flake8 --config .flake8 pager_duty_stats/ tests/

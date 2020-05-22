@@ -1,6 +1,7 @@
 from pager_duty_stats.logic.incident_types import extract_incident_type
 from pager_duty_stats.logic.incident_types import ExtractionTechnique
 
+
 def test_extract_incident_type_title():
     assert extract_incident_type(
         incident={
@@ -17,6 +18,7 @@ def test_extract_incident_type_yc_part_2():
         },
         extraction_technique=ExtractionTechnique.YC
     ) == 'Title Part 2'
+
 
 def test_extract_incident_type_yc():
     assert extract_incident_type(

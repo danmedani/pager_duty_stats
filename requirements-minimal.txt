@@ -5,3 +5,5 @@ pytest
 argparse
 coverage
 mock
+flake8
+reorder-python-imports

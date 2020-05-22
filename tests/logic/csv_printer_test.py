@@ -1,12 +1,14 @@
-import pytest
-import mock
-from pager_duty_stats.logic.csv_printer import get_aggregation_type_values
-from pager_duty_stats.logic.csv_printer import get_header_fieldnames
-from pager_duty_stats.logic.csv_printer import print_statistics
 from collections import defaultdict
+
+import mock
+import pytest
+
 from pager_duty_stats.logic.aggregation import AggregationType
 from pager_duty_stats.logic.aggregation import AggregrateStats
 from pager_duty_stats.logic.aggregation import GroupingWindow
+from pager_duty_stats.logic.csv_printer import get_aggregation_type_values
+from pager_duty_stats.logic.csv_printer import get_header_fieldnames
+from pager_duty_stats.logic.csv_printer import print_statistics
 
 
 @pytest.fixture
@@ -43,7 +45,7 @@ def test_print_statistics_smoke_test(
     )
     mock_DictWriter.assert_called_once_with(
         mock.ANY,
-        fieldnames=mock.ANY, # see test_get_header_fieldnames
+        fieldnames=mock.ANY,  # see test_get_header_fieldnames
         delimiter='\t'
     )
 
@@ -52,7 +54,7 @@ def test_get_header_fieldnames():
     assert get_header_fieldnames(
         output_date_col_name='Week',
         aggregation_types=[
-            AggregationType.TIME_OF_DAY, 
+            AggregationType.TIME_OF_DAY,
             AggregationType.SERVICE_NAME
         ],
         aggregation_type_values={
@@ -60,6 +62,7 @@ def test_get_header_fieldnames():
             AggregationType.TIME_OF_DAY: ['work', 'sleep', 'leisure']
         }
     ) == ['Week', 'Total Pages', 'work', 'sleep', 'leisure', 'service A', 'service B', 'service C']
+
 
 def test_get_header_fieldnames_different_order():
     assert get_header_fieldnames(
