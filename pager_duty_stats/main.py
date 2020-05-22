@@ -56,7 +56,7 @@ if __name__ == "__main__":
 
 	aggregation_types = fetch_aggregation_types(options)
 	print_statistics(
-		date_col=str(options.grouping_window).capitalize(),
+		grouping_window=options.grouping_window,
 		stats=get_stats(
 			incidents=incidents,
 			start_date=options.start_date,

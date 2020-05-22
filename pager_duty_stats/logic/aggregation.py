@@ -160,15 +160,15 @@ def get_stats(
 		incident_type_extraction_technique
 	)
 
+	if grouping_window == GroupingWindow.DAY:
+		return stats_by_day
+
 	if grouping_window == GroupingWindow.WEEK:
 		return convert_day_stats_to_week_stats(
 			stats_by_day, 
 			end_date,
 			aggregation_types
 		)
-	
-	if grouping_window == GroupingWindow.DAY:
-		return stats_by_day
 
 	raise Exception('Grouping Window {} not recognized'.format(grouping_window))
 
