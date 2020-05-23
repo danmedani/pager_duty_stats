@@ -98,7 +98,7 @@ def extract_aggregation_value(
             incident_type_extraction_technique
         )
 
-    raise Exception('Aggregation group {} not supported!'.format(aggregation_type))
+    raise Exception('Aggregation group {} not supported!'.format(aggregation_type))  # pragma nocover
 
 
 def get_stats_by_day(
@@ -188,7 +188,7 @@ def fill_out_empty_days(
     return stats
 
 
-def get_earlist_date(dates: List[str]) -> str:
+def get_earliest_date(dates: List[str]) -> str:
     earliest_date = str(datetime.now().date())
     for date in dates:
         if date < earliest_date:
@@ -196,14 +196,14 @@ def get_earlist_date(dates: List[str]) -> str:
     return earliest_date
 
 
-def find_first_monday(date: str) -> str:
+def find_next_monday(date: str) -> str:
     first_monday = datetime.strptime(date, '%Y-%m-%d')
     while first_monday.weekday() > 0:
         first_monday += timedelta(days=1)
     return str(first_monday.date())
 
 
-def get_weekday(date: str) -> int:
+def get_weekday_index(date: str) -> int:
     return datetime.strptime(date, '%Y-%m-%d').weekday()
 
 
@@ -216,14 +216,14 @@ def convert_day_stats_to_week_stats(
     running_week_stats = get_fresh_aggregate_stats(aggregation_types)
     start_of_week = None
 
-    start_date = find_first_monday(
-        get_earlist_date(list(stats.keys()))
+    start_date = find_next_monday(
+        get_earliest_date(list(stats.keys()))
     )
     for date in step_through_dates(
         start_date,
         end_date
     ):
-        if get_weekday(date) == 0:
+        if get_weekday_index(date) == 0:
             if start_of_week:
                 week_stats[start_of_week] = running_week_stats
 
