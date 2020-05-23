@@ -167,9 +167,9 @@ def test_extract_aggregation_value_for_custom_incident_type():
     ) == 'Title: Test'
 
 
-@freeze_time('2020-05-23 05:51:58', tz_offset=0)
+@freeze_time('2020-05-23', tz_offset=-7)
 def test_extract_aggregation_value_for_time_of_day():
-    incidents = create_incidents('test_service_summary', '2020-05-23T05:51:58Z', 'test_title')
+    incidents = create_incidents('test_service_summary', '2020-05-23T03:51:58Z', 'test_title')
 
     assert extract_aggregation_value(
         incidents,
