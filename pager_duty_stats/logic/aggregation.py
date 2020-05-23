@@ -138,8 +138,7 @@ def get_stats_by_day(
     if AggregationType.CUSTOM_INCIDENT_TYPE in aggregation_types:
         return clean_error_type_counts(
             filled_out_stats,
-            max_incident_types,
-            aggregation_types
+            max_incident_types
         )
     return filled_out_stats
 
@@ -242,8 +241,7 @@ def convert_day_stats_to_week_stats(
 
 def clean_error_type_counts(
     stats: Dict[str, AggregrateStats],
-    max_incident_types: int,
-    aggregation_types: List[AggregationType]
+    max_incident_types: int
 ) -> Dict[str, AggregrateStats]:
     # removes any errors that don't happen v often
     total_error_type_counts = {}

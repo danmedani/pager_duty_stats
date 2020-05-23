@@ -9,6 +9,7 @@ from pager_duty_stats.logic.aggregation import AggregrateStats
 from pager_duty_stats.logic.aggregation import classify_incident_time
 from pager_duty_stats.logic.aggregation import extract_aggregation_value
 from pager_duty_stats.logic.aggregation import ExtractionTechnique
+from pager_duty_stats.logic.aggregation import clean_error_type_counts
 from pager_duty_stats.logic.aggregation import fill_out_empty_days
 from pager_duty_stats.logic.aggregation import find_next_monday
 from pager_duty_stats.logic.aggregation import get_earliest_date
@@ -284,6 +285,85 @@ def test_get_stats_by_day_with_per_service():
             aggregations={
                 AggregationType.SERVICE_NAME: {
                     'service B': 1
+                }
+            }
+        )
+    }
+
+
+def test_clean_error_type_counts():
+    # page A, C, & E have more
+    assert clean_error_type_counts(
+        stats={
+            '2020-01-01': AggregrateStats(
+                total_pages=9,
+                aggregations={
+                    AggregationType.CUSTOM_INCIDENT_TYPE: {
+                        'Page A': 1,
+                        'Page B': 1,
+                        'Page C': 5,
+                        'Page D': 1,
+                        'Page E': 1,
+                    }
+                }
+            ),
+            '2020-01-02': AggregrateStats(
+                total_pages=5,
+                aggregations={
+                    AggregationType.CUSTOM_INCIDENT_TYPE: {
+                        'Page A': 1,
+                        'Page B': 1,
+                        'Page C': 1,
+                        'Page D': 1,
+                        'Page E': 1,
+                    }
+                }
+            ),
+            '2020-01-02': AggregrateStats(
+                total_pages=8,
+                aggregations={
+                    AggregationType.CUSTOM_INCIDENT_TYPE: {
+                        'Page A': 2,
+                        'Page B': 1,
+                        'Page C': 1,
+                        'Page D': 1,
+                        'Page E': 3,
+                    }
+                }
+            )
+        },
+        max_incident_types=3
+    ) == {
+        '2020-01-01': AggregrateStats(
+            total_pages=9,
+            aggregations={
+                AggregationType.CUSTOM_INCIDENT_TYPE: {
+                    'Page A': 1,
+                    'Page C': 5,
+                    'Page E': 1,
+                    'miscellaneous': 2
+                }
+            }
+        ),
+        '2020-01-02': AggregrateStats(
+            total_pages=5,
+            aggregations={
+                AggregationType.CUSTOM_INCIDENT_TYPE: {
+                    'Page A': 1,
+                    'Page C': 1,
+                    'Page E': 1,
+                    'miscellaneous': 2
+                }
+            }
+        ),
+        '2020-01-02': AggregrateStats(
+            total_pages=8,
+            aggregations={
+                AggregationType.CUSTOM_INCIDENT_TYPE: {
+                    'Page A': 2,
+                    'Page C': 1,
+                    'Page E': 3,
+                    'miscellaneous': 2
                 }
             }
         )
