@@ -12,12 +12,16 @@ from pager_duty_stats.logic.incident_types import ExtractionTechnique
 from pager_duty_stats.logic.pager_duty_client import fetch_all_incidents
 
 
-def get_pager_duty_api_key(file_name: str) -> str:
+class InvalidOptionsException(Exception):
+    pass
+
+
+def get_pager_duty_api_key(file_name: str) -> str:   # pragma: no cover
     with open(file_name, 'r') as file:
         return file.readlines()[0].rstrip('\n')
 
 
-def parse_args() -> Namespace:
+def parse_args(args: List[str]) -> Namespace:
     parser = argparse.ArgumentParser(description='Aggregate PagerDuty stats & output a csv')
     parser.add_argument('--pd-key-file', default='.api_key', help="""
 File containing API Key to access api.pagerduty.com (default .api_key)""")
@@ -42,23 +46,25 @@ Technique for reducing/classifying incidents (for use with --include-incident-ty
     parser.add_argument('--max-incident-types', type=int, help="""
 (For use with --include-incident-types): this determines how many of the most common incident types to show. (default: 10)""")
 
-    return parser.parse_args(sys.argv[1:])
+    return parser.parse_args(args)
 
 
 def fetch_aggregation_types(options: Namespace) -> List[AggregationType]:
+    # Let's always include the service name type
     aggregation_types = [AggregationType.SERVICE_NAME]
     if options.include_time_of_day_counts:
         aggregation_types.append(AggregationType.TIME_OF_DAY)
     if options.include_incident_types:
         if not options.max_incident_types:
-            raise Exception('When using --include-incident-types, please include --max-incident-types')
+            raise InvalidOptionsException('When using --include-incident-types, please include --max-incident-types')
         aggregation_types.append(AggregationType.CUSTOM_INCIDENT_TYPE)
 
     return aggregation_types
 
 
-if __name__ == "__main__":
-    options = parse_args()
+def run(args: List[str]):
+    options = parse_args(args)
+    aggregation_types = fetch_aggregation_types(options)
 
     incidents = fetch_all_incidents(
         pd_api_key=get_pager_duty_api_key(options.pd_key_file),
@@ -67,7 +73,6 @@ if __name__ == "__main__":
         end_date=options.end_date
     )
 
-    aggregation_types = fetch_aggregation_types(options)
     print_statistics(
         start_date=options.start_date,
         end_date=options.end_date,
@@ -83,3 +88,7 @@ if __name__ == "__main__":
         ),
         aggregation_types=aggregation_types
     )
+
+
+if __name__ == "__main__":   # pragma: no cover
+    run(sys.argv[1:])
