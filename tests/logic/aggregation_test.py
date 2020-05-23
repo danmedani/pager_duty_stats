@@ -79,6 +79,15 @@ def test_fill_out_empty_days():
         '2020-01-10': EMPTY_STATS,
     }
 
+def test_classify_incident_time():
+	assert classify_incident_time(datetime(2008, 12, 12, 4)) == IncidentTime.SLEEP
+	assert classify_incident_time(datetime(2008, 12, 12, 7)) == IncidentTime.SLEEP
+	assert classify_incident_time(datetime(2008, 12, 12, 8)) == IncidentTime.WORK
+	assert classify_incident_time(datetime(2008, 12, 12, 14)) == IncidentTime.WORK
+	assert classify_incident_time(datetime(2008, 12, 12, 18)) == IncidentTime.LEISURE
+	assert classify_incident_time(datetime(2008, 12, 12, 19)) == IncidentTime.LEISURE
+	assert classify_incident_time(datetime(2008, 12, 12, 20)) == IncidentTime.LEISURE
+
 
 def test_get_stats_by_day_no_aggregation_types():
     assert get_stats_by_day(
