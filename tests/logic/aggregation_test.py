@@ -8,13 +8,16 @@ from pager_duty_stats.logic.aggregation import AggregationType
 from pager_duty_stats.logic.aggregation import AggregrateStats
 from pager_duty_stats.logic.aggregation import classify_incident_time
 from pager_duty_stats.logic.aggregation import clean_error_type_counts
+from pager_duty_stats.logic.aggregation import convert_day_stats_to_week_stats
 from pager_duty_stats.logic.aggregation import extract_aggregation_value
 from pager_duty_stats.logic.aggregation import ExtractionTechnique
 from pager_duty_stats.logic.aggregation import fill_out_empty_days
 from pager_duty_stats.logic.aggregation import find_next_monday
 from pager_duty_stats.logic.aggregation import get_earliest_date
+from pager_duty_stats.logic.aggregation import get_stats
 from pager_duty_stats.logic.aggregation import get_stats_by_day
 from pager_duty_stats.logic.aggregation import get_weekday_index
+from pager_duty_stats.logic.aggregation import GroupingWindow
 from pager_duty_stats.logic.aggregation import IncidentTime
 from pager_duty_stats.logic.aggregation import is_week_day
 
@@ -419,3 +422,135 @@ def test_clean_error_type_counts():
             }
         )
     }
+
+
+def test_clean_error_type_counts_no_cleaning_necessary():
+    mock_stats = {
+        '2020-01-01': AggregrateStats(
+            total_pages=9,
+            aggregations={
+                AggregationType.CUSTOM_INCIDENT_TYPE: {
+                    'Page A': 1,
+                    'Page B': 1,
+                    'Page C': 5,
+                    'Page D': 1,
+                    'Page E': 1,
+                }
+            }
+        ),
+        '2020-01-02': AggregrateStats(
+            total_pages=5,
+            aggregations={
+                AggregationType.CUSTOM_INCIDENT_TYPE: {
+                    'Page A': 1,
+                    'Page B': 1,
+                    'Page C': 1,
+                    'Page D': 1,
+                    'Page E': 1,
+                }
+            }
+        ),
+        '2020-01-03': AggregrateStats(
+            total_pages=8,
+            aggregations={
+                AggregationType.CUSTOM_INCIDENT_TYPE: {
+                    'Page A': 2,
+                    'Page B': 1,
+                    'Page C': 1,
+                    'Page D': 1,
+                    'Page E': 3,
+                }
+            }
+        )
+    }
+
+    assert clean_error_type_counts(
+        stats=mock_stats,
+        max_incident_types=10
+    ) == mock_stats
+
+
+@mock.patch('pager_duty_stats.logic.aggregation.get_stats_by_day')
+@mock.patch('pager_duty_stats.logic.aggregation.convert_day_stats_to_week_stats')
+def test_get_stats_via_day(
+    mock_convert_day_stats_to_week_stats,
+    mock_get_stats_by_day
+):
+    stats_mock = mock.Mock()
+    mock_get_stats_by_day.return_value = stats_mock
+    assert get_stats(
+        incidents=mock.Mock(),
+        start_date='2020-01-01',
+        end_date='2020-02-01',
+        grouping_window=GroupingWindow.DAY,
+        aggregation_types=[],
+        incident_type_extraction_technique=mock.Mock(),
+        max_incident_types=0
+    ) == stats_mock
+    mock_convert_day_stats_to_week_stats.assert_not_called()
+
+
+@mock.patch('pager_duty_stats.logic.aggregation.get_stats_by_day')
+@mock.patch('pager_duty_stats.logic.aggregation.convert_day_stats_to_week_stats')
+def test_get_stats_via_week(
+    mock_convert_day_stats_to_week_stats,
+    mock_get_stats_by_day
+):
+    stats_mock = mock.Mock()
+    week_mock = mock.Mock()
+    mock_get_stats_by_day.return_value = stats_mock
+    mock_convert_day_stats_to_week_stats.return_value = week_mock
+
+    assert get_stats(
+        incidents=mock.Mock(),
+        start_date='2020-01-01',
+        end_date='2020-02-01',
+        grouping_window=GroupingWindow.WEEK,
+        aggregation_types=[],
+        incident_type_extraction_technique=mock.Mock(),
+        max_incident_types=0
+    ) == week_mock
+
+
+def test_convert_day_stats_to_week_stats_one_week():
+    # Grab 1 weeks worth
+    a_stats = AggregrateStats(
+        total_pages=9,
+        aggregations={
+            AggregationType.CUSTOM_INCIDENT_TYPE: {
+                'Page A': 1,
+                'Page B': 1,
+                'Page C': 5,
+                'Page D': 1,
+                'Page E': 1,
+            }
+        }
+    )
+    convert_day_stats_to_week_stats(
+        stats={
+            '2020-05-01': a_stats,
+            '2020-05-02': a_stats,
+            '2020-05-03': a_stats,
+            '2020-05-04': a_stats,  # mon
+            '2020-05-05': a_stats,  # tus
+            '2020-05-06': a_stats,  # wed
+            '2020-05-07': a_stats,  # thu
+            '2020-05-08': a_stats,  # fri
+            '2020-05-09': a_stats,  # sat
+            '2020-05-10': a_stats,  # sun
+            '2020-05-11': a_stats,
+        },
+        end_date='2020-05-11',
+        aggregation_types=[AggregationType.CUSTOM_INCIDENT_TYPE]
+    ) == AggregrateStats(
+        total_pages=45,
+        aggregations={
+            AggregationType.CUSTOM_INCIDENT_TYPE: {
+                'Page A': 7,
+                'Page B': 7,
+                'Page C': 35,
+                'Page D': 7,
+                'Page E': 7,
+            }
+        }
+    )

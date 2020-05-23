@@ -171,7 +171,7 @@ def get_stats(
             aggregation_types
         )
 
-    raise Exception('Grouping Window {} not recognized'.format(grouping_window))
+    raise Exception('Grouping Window {} not recognized'.format(grouping_window))   # pragma: no cover
 
 
 def fill_out_empty_days(
