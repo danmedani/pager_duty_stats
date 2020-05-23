@@ -7,9 +7,9 @@ import mock
 from pager_duty_stats.logic.aggregation import AggregationType
 from pager_duty_stats.logic.aggregation import AggregrateStats
 from pager_duty_stats.logic.aggregation import classify_incident_time
+from pager_duty_stats.logic.aggregation import clean_error_type_counts
 from pager_duty_stats.logic.aggregation import extract_aggregation_value
 from pager_duty_stats.logic.aggregation import ExtractionTechnique
-from pager_duty_stats.logic.aggregation import clean_error_type_counts
 from pager_duty_stats.logic.aggregation import fill_out_empty_days
 from pager_duty_stats.logic.aggregation import find_next_monday
 from pager_duty_stats.logic.aggregation import get_earliest_date
@@ -319,7 +319,7 @@ def test_clean_error_type_counts():
                     }
                 }
             ),
-            '2020-01-02': AggregrateStats(
+            '2020-01-03': AggregrateStats(
                 total_pages=8,
                 aggregations={
                     AggregationType.CUSTOM_INCIDENT_TYPE: {
@@ -356,7 +356,7 @@ def test_clean_error_type_counts():
                 }
             }
         ),
-        '2020-01-02': AggregrateStats(
+        '2020-01-03': AggregrateStats(
             total_pages=8,
             aggregations={
                 AggregationType.CUSTOM_INCIDENT_TYPE: {
