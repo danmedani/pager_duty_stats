@@ -34,7 +34,7 @@ tst: lint mypy
 
 .PHONY: lint
 lint: 
-	@echo "    ----    Re-ordering imports    ----    "
+	@echo "    ----    Re-Ordering imports    ----    "
 	@find pager_duty_stats tests -name *.py -exec reorder-python-imports {} +
 	@echo "    ----    Running linter    ----    "
 	@flake8 --config .flake8 pager_duty_stats/ tests/
