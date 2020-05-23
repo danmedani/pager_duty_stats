@@ -94,7 +94,9 @@ def test_fetch_aggregation_types_all_options():
 @mock.patch('pager_duty_stats.main.fetch_all_incidents')
 @mock.patch('pager_duty_stats.main.print_statistics')
 @mock.patch('pager_duty_stats.main.get_stats')
+@mock.patch('pager_duty_stats.main.get_pager_duty_api_key')
 def test_run_smoke(
+    mock_get_pager_duty_api_key,
     mock_get_stats,
     mock_print_statistics,
     mock_fetch_all_incidents
