@@ -4,6 +4,7 @@ from datetime import timezone
 
 from pager_duty_stats.logic.aggregation import AggregationType
 from pager_duty_stats.logic.aggregation import AggregrateStats
+from pager_duty_stats.logic.aggregation import classify_incident_time
 from pager_duty_stats.logic.aggregation import fill_out_empty_days
 from pager_duty_stats.logic.aggregation import get_stats_by_day
 from pager_duty_stats.logic.aggregation import IncidentTime
@@ -78,6 +79,16 @@ def test_fill_out_empty_days():
         '2020-01-09': EMPTY_STATS,
         '2020-01-10': EMPTY_STATS,
     }
+
+
+def test_classify_incident_time():
+    assert classify_incident_time(datetime(2008, 12, 12, 4)) == IncidentTime.SLEEP
+    assert classify_incident_time(datetime(2008, 12, 12, 7)) == IncidentTime.SLEEP
+    assert classify_incident_time(datetime(2008, 12, 12, 8)) == IncidentTime.WORK
+    assert classify_incident_time(datetime(2008, 12, 12, 14)) == IncidentTime.WORK
+    assert classify_incident_time(datetime(2008, 12, 12, 18)) == IncidentTime.LEISURE
+    assert classify_incident_time(datetime(2008, 12, 12, 19)) == IncidentTime.LEISURE
+    assert classify_incident_time(datetime(2008, 12, 12, 20)) == IncidentTime.LEISURE
 
 
 def test_get_stats_by_day_no_aggregation_types():
