@@ -2,7 +2,7 @@ from collections import defaultdict
 from datetime import datetime
 from datetime import timezone
 
-from freezegun import freeze_time
+import mock
 
 from pager_duty_stats.logic.aggregation import AggregationType
 from pager_duty_stats.logic.aggregation import AggregrateStats
@@ -167,23 +167,16 @@ def test_extract_aggregation_value_for_custom_incident_type():
     ) == 'Title: Test'
 
 
-@freeze_time('2020-05-23', tz_offset=-7)
-def test_extract_aggregation_value_for_time_of_day():
-    incidents = create_incidents('test_service_summary', '2020-05-23T03:51:58Z', 'test_title')
-
+@mock.patch('pager_duty_stats.logic.aggregation.classify_incident_time')
+def test_extract_aggregation_value_for_time_of_day(
+    mock_classify_incident_time
+):
+    mock_classify_incident_time.return_value = IncidentTime.LEISURE
     assert extract_aggregation_value(
-        incidents,
+        create_incidents('test_service_summary', '2020-05-23T03:51:58Z', 'test_title'),
         AggregationType.TIME_OF_DAY,
         ExtractionTechnique.YC
     ) == 'leisure'
-
-    incidents2 = create_incidents('test_service_summary', '2020-05-22T00:51:58Z', 'test_title')
-
-    assert extract_aggregation_value(
-        incidents2,
-        AggregationType.TIME_OF_DAY,
-        ExtractionTechnique.YC
-    ) == 'work'
 
 
 def test_extract_aggregation_value_for_unsupported_aggregation_type():

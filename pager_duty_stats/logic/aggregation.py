@@ -81,7 +81,6 @@ def extract_aggregation_value(
     incident_type_extraction_technique: ExtractionTechnique
 ) -> str:
     if aggregation_type == AggregationType.SERVICE_NAME:
-        print(incident['service'])
         return incident['service']['summary']
 
     if aggregation_type == AggregationType.TIME_OF_DAY:

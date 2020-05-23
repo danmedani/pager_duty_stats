@@ -7,4 +7,3 @@ coverage
 mock
 flake8
 reorder-python-imports
-freezegun
