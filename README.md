@@ -1,4 +1,8 @@
+
 # pager_duty_stats
+
+[![Build Status](https://travis-ci.com/danmedani/pager_duty_stats.svg?branch=master)](https://travis-ci.com/github/danmedani/pager_duty_stats)
+
 Gathers and aggregates PagerDuty incident statistics and outputs tab-separated csv. 
 
 
