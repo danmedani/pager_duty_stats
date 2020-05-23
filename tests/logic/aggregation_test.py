@@ -291,6 +291,57 @@ def test_get_stats_by_day_with_per_service():
     }
 
 
+def test_get_stats_by_day_with_custom():
+    assert get_stats_by_day(
+        incidents=[
+            {
+                'created_at': '2020-05-18T16:00:50Z',
+                'title': 'Page A'
+            },
+            {
+                'created_at': '2020-05-18T15:00:50Z',
+                'title': 'Page A'
+            },
+            {
+                'created_at': '2020-05-18T16:00:50Z',
+                'title': 'Page B'
+            },
+            {
+                'created_at': '2020-05-18T16:00:50Z',
+                'title': 'Page C'
+            },
+            {
+                'created_at': '2020-05-19T16:00:50Z',
+                'title': 'Page B'
+            }
+        ],
+        start_date='2020-05-18',
+        end_date='2020-05-19',
+        aggregation_types=[AggregationType.CUSTOM_INCIDENT_TYPE],
+        max_incident_types=2,
+        incident_type_extraction_technique=ExtractionTechnique.TITLE
+    ) == {
+        '2020-05-18': AggregrateStats(
+            total_pages=4,
+            aggregations={
+                AggregationType.CUSTOM_INCIDENT_TYPE: {
+                    'Page A': 2,
+                    'Page B': 1,
+                    'miscellaneous': 1,
+                }
+            }
+        ),
+        '2020-05-19': AggregrateStats(
+            total_pages=1,
+            aggregations={
+                AggregationType.CUSTOM_INCIDENT_TYPE: {
+                    'Page B': 1
+                }
+            }
+        ),
+    }
+
+
 def test_clean_error_type_counts():
     # page A, C, & E have more
     assert clean_error_type_counts(
