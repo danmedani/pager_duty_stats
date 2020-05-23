@@ -2,11 +2,18 @@ from collections import defaultdict
 from datetime import datetime
 from datetime import timezone
 
+import mock
+
 from pager_duty_stats.logic.aggregation import AggregationType
 from pager_duty_stats.logic.aggregation import AggregrateStats
 from pager_duty_stats.logic.aggregation import classify_incident_time
+from pager_duty_stats.logic.aggregation import extract_aggregation_value
+from pager_duty_stats.logic.aggregation import ExtractionTechnique
 from pager_duty_stats.logic.aggregation import fill_out_empty_days
+from pager_duty_stats.logic.aggregation import find_next_monday
+from pager_duty_stats.logic.aggregation import get_earliest_date
 from pager_duty_stats.logic.aggregation import get_stats_by_day
+from pager_duty_stats.logic.aggregation import get_weekday_index
 from pager_duty_stats.logic.aggregation import IncidentTime
 from pager_duty_stats.logic.aggregation import is_week_day
 
@@ -81,6 +88,29 @@ def test_fill_out_empty_days():
     }
 
 
+def test_get_earliest_date():
+    assert get_earliest_date(['2020-02-02', '2019-03-01']) == '2019-03-01'
+    assert get_earliest_date(['2020-02-02', '2020-02-01']) == '2020-02-01'
+    assert get_earliest_date(['2020-02-02']) == '2020-02-02'
+    assert get_earliest_date(['2020-02-02', '2019-03-01', '2019-02-01']) == '2019-02-01'
+    assert get_earliest_date(['2020-08-22', '2020-02-02', '2019-03-01', '2019-11-11']) == '2019-03-01'
+    assert get_earliest_date(['2017-02-02', '2019-03-01']) == '2017-02-02'
+
+
+def test_find_next_monday():
+    assert find_next_monday('2020-05-22') == '2020-05-25'
+    assert find_next_monday('2020-05-23') == '2020-05-25'
+    assert find_next_monday('2020-05-24') == '2020-05-25'
+    assert find_next_monday('2020-05-25') == '2020-05-25'
+
+
+def test_get_weekday_index():
+    assert get_weekday_index('2020-05-22') == 4
+    assert get_weekday_index('2020-05-21') == 3
+    assert get_weekday_index('2020-05-23') == 5
+    assert get_weekday_index('2020-05-24') == 6
+
+
 def test_classify_incident_time():
     assert classify_incident_time(datetime(2008, 12, 12, 4)) == IncidentTime.SLEEP
     assert classify_incident_time(datetime(2008, 12, 12, 7)) == IncidentTime.SLEEP
@@ -89,6 +119,74 @@ def test_classify_incident_time():
     assert classify_incident_time(datetime(2008, 12, 12, 18)) == IncidentTime.LEISURE
     assert classify_incident_time(datetime(2008, 12, 12, 19)) == IncidentTime.LEISURE
     assert classify_incident_time(datetime(2008, 12, 12, 20)) == IncidentTime.LEISURE
+    assert classify_incident_time(datetime(2020, 5, 23, 12)) == IncidentTime.LEISURE
+    assert classify_incident_time(datetime(2020, 5, 23, 9)) == IncidentTime.LEISURE
+
+
+def create_incidents(summary: str, created_at: str, title: str):
+    incidents = {}
+    incidents['service'] = {}
+    incidents['service']['summary'] = summary
+    incidents['created_at'] = created_at
+    incidents['title'] = title
+
+    return incidents
+
+
+def test_extract_aggregation_value_for_service_name():
+    incidents = create_incidents('test_service_summary', '2020-05-23T05:51:58Z', 'test_title')
+
+    assert extract_aggregation_value(
+        incidents,
+        AggregationType.SERVICE_NAME,
+        ExtractionTechnique.TITLE
+    ) == 'test_service_summary'
+
+
+def test_extract_aggregation_value_for_custom_incident_type():
+    incidents = create_incidents('test_service_summary', '2020-05-23T05:51:58Z', 'test_title')
+
+    assert extract_aggregation_value(
+        incidents,
+        AggregationType.CUSTOM_INCIDENT_TYPE,
+        ExtractionTechnique.TITLE
+    ) == 'test_title'
+
+    assert extract_aggregation_value(
+        incidents,
+        AggregationType.CUSTOM_INCIDENT_TYPE,
+        ExtractionTechnique.YC
+    ) == 'test_title'
+
+    incidents2 = create_incidents('test_service_summary', '2020-05-23T05:51:58Z', 'Title: Test')
+
+    assert extract_aggregation_value(
+        incidents2,
+        AggregationType.CUSTOM_INCIDENT_TYPE,
+        ExtractionTechnique.YC
+    ) == 'Title: Test'
+
+
+@mock.patch('pager_duty_stats.logic.aggregation.classify_incident_time')
+def test_extract_aggregation_value_for_time_of_day(
+    mock_classify_incident_time
+):
+    mock_classify_incident_time.return_value = IncidentTime.LEISURE
+    assert extract_aggregation_value(
+        create_incidents('test_service_summary', '2020-05-23T03:51:58Z', 'test_title'),
+        AggregationType.TIME_OF_DAY,
+        ExtractionTechnique.YC
+    ) == 'leisure'
+
+
+def test_extract_aggregation_value_for_unsupported_aggregation_type():
+    incidents = create_incidents('test_service_summary', '2020-05-23T05:51:58Z', 'test_title')
+
+    assert extract_aggregation_value(
+        incidents,
+        AggregationType.SERVICE_NAME,
+        ExtractionTechnique.TITLE
+    ) == 'test_service_summary'
 
 
 def test_get_stats_by_day_no_aggregation_types():
