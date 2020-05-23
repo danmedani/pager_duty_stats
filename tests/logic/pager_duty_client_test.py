@@ -43,7 +43,6 @@ def test_fetch_incident_chunk_200(
         }
     )
 
-
 @mock.patch('pager_duty_stats.logic.pager_duty_client.requests')
 def test_fetch_incident_chunk_invalid_service(
     mock_requests
