@@ -7,3 +7,4 @@ __pycache__
 todo
 *.pyc
 .coverage
+node_modules
