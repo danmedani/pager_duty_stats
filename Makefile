@@ -40,6 +40,10 @@ lint:
 	@flake8 --config .flake8 pager_duty_stats/ tests/
 	coverage report -m
 
+.PHONY: webpack
+webpack:
+	npx webpack --mode development --config ui/webpack.config.js
+
 .PHONY: web
-web:
+web: webpack
 	uwsgi --http 127.0.0.1:3031 --wsgi-file pager_duty_stats/webserver.py --callable app --processes 4 --threads 2 --stats 127.0.0.1:9191

@@ -1,6 +1,8 @@
 'use strict';
 
-import Donut from './modules/donut';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import Donut from './donut';
 
 const e = React.createElement;
 
