@@ -42,7 +42,7 @@ lint:
 
 .PHONY: webpack
 webpack:
-	npx webpack --mode development --config ui/webpack.config.js
+	npx webpack --mode production --config ui/webpack.config.js
 
 .PHONY: web
 web: webpack
