@@ -8,4 +8,4 @@ todo
 *.pyc
 .coverage
 node_modules
-web/lib
+ui/dist/main.js
