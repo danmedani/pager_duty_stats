@@ -42,6 +42,7 @@ def fetch_incident_chunk(
         'limit': str(limit),
         'offset': str(offset)
     }
+    print(params)
     r = requests.get(PAGER_DUTY_API, headers=headers, params=params)
 
     if r.status_code == 400:

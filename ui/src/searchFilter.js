@@ -10,17 +10,23 @@ class SearchFilter extends React.Component {
       loadingData: false,
       startDate: '2020-01-01',
       endDate: null,
-      serviceIds: 'asd'
+      serviceIds: 'asd',
+      pdApiKey: ''
     };
+
+    this.handleInputChange = this.handleInputChange.bind(this);
   }
 
-  handleGroupChange(event) {
-    this.setState({groupingWindow: event.target.value});
-  }
 
-  // handleGroupChange(event) {
-  //   this.setState({groupingWindow: event.target.value});
-  // }
+  handleInputChange(event) {
+    const target = event.target;
+    const value = target.value;
+    const name = target.name;
+
+    this.setState({
+      [name]: value
+    });
+  }
 
   fetchData() {
     this.setState({
@@ -31,7 +37,8 @@ class SearchFilter extends React.Component {
       'service_ids': this.state.serviceIds,
       'start_date': this.state.startDate,
       'end_date': this.state.endDate,
-      'grouping_window': this.state.groupingWindow
+      'grouping_window': this.state.groupingWindow,
+      'pd_api_key': this.state.pdApiKey,
     };
     fetch(
       'http://127.0.0.1:3031/api/chart',
@@ -66,13 +73,29 @@ class SearchFilter extends React.Component {
   render() {
     return (
       <div id="searchFilter">
-        <TextField id="outlined-basic" label="Service IDs" variant="outlined" value={this.state.serviceIds} />
+        <TextField 
+          id="outlined-basic" 
+          label="Service IDs" 
+          variant="outlined" 
+          name="serviceIds"
+          value={this.state.serviceIds} 
+          onChange={this.handleInputChange} 
+        />
+        <TextField 
+          id="outlined-basic" 
+          label="Api Key" 
+          variant="outlined" 
+          name="pdApiKey"
+          value={this.state.pdApiKey} 
+          onChange={this.handleInputChange} 
+        />
         <TextField
           id="date"
           label="Start Date"
           type="date"
-          // defaultValue="2020-01-01"
+          name="startDate"
           value={this.state.startDate}
+          onChange={this.handleInputChange}
           InputLabelProps={{
               shrink: true,
           }}
@@ -81,12 +104,13 @@ class SearchFilter extends React.Component {
           id="date"
           label="End Date"
           type="date"
-          defaultValue="2021-01-01"
+          name="endDate"
+          onChange={this.handleInputChange}
           InputLabelProps={{
               shrink: true,
           }}
         />
-        <RadioGroup aria-label="Grouping Window" name="groupingWindow" value={this.state.groupingWindow} onChange={(event) => this.handleGroupChange(event)}>
+        <RadioGroup aria-label="Grouping Window" name="groupingWindow" value={this.state.groupingWindow} onChange={this.handleInputChange}>
           <FormControlLabel value="day" control={<Radio />} label="Day" />
           <FormControlLabel value="week" control={<Radio />} label="Week" />
         </RadioGroup>
