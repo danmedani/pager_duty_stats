@@ -8,9 +8,9 @@ class SearchFilter extends React.Component {
     this.state = {
       groupingWindow: 'day',
       loadingData: false,
-      startDate: '2020-01-01',
+      startDate: '2020-05-01',
       endDate: null,
-      serviceIds: 'asd',
+      serviceIds: 'P289YKV,PJQKKBU',
       pdApiKey: ''
     };
 
@@ -57,6 +57,7 @@ class SearchFilter extends React.Component {
             loadingData: false,
             items: result.items
           });
+          this.props.updateChartDataCallback(result);
         },
         // Note: it's important to handle errors here
         // instead of a catch() block so that we don't swallow
