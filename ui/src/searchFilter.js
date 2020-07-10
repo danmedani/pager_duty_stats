@@ -40,6 +40,7 @@ class SearchFilter extends React.Component {
       'grouping_window': this.state.groupingWindow,
       'pd_api_key': this.state.pdApiKey,
     };
+    this.props.beginSearchCallback();
     fetch(
       'http://127.0.0.1:3031/api/chart',
       {
@@ -58,6 +59,7 @@ class SearchFilter extends React.Component {
             items: result.items
           });
           this.props.updateChartDataCallback(result);
+          this.props.endSearchCallback();
         },
         // Note: it's important to handle errors here
         // instead of a catch() block so that we don't swallow
@@ -67,6 +69,7 @@ class SearchFilter extends React.Component {
             loadingData: false,
             error
           });
+          this.props.endSearchCallback();
         }
       )
   }
@@ -115,7 +118,7 @@ class SearchFilter extends React.Component {
           <FormControlLabel value="day" control={<Radio />} label="Day" />
           <FormControlLabel value="week" control={<Radio />} label="Week" />
         </RadioGroup>
-        <Button variant="contained" color="primary" onClick={() => this.fetchData()}>
+        <Button variant="contained" color="primary" onClick={() => this.fetchData()} disabled={this.props.searchButtonDisabled}>
           Search
         </Button>
       </div>

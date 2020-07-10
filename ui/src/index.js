@@ -4,6 +4,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import StackedColumn from './stackedColumn';
 import SearchFilter from './searchFilter';
+import { CircularProgress } from '@material-ui/core';
 
 const e = React.createElement;
 
@@ -54,10 +55,13 @@ class ChartPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = { 
-      chartData: blankChart
+      chartData: blankChart,
+      searchButtonDisabled: false
     };
 
     this.updateChartData = this.updateChartData.bind(this);
+    this.beginSearch = this.beginSearch.bind(this);
+    this.endSearch = this.endSearch.bind(this);
   }
 
   updateChartData(chartDataFromSearch) {
@@ -67,14 +71,37 @@ class ChartPage extends React.Component {
     this.setState({chartData: chartData});
   }
 
+  beginSearch() {
+    this.setState({searchButtonDisabled: true});
+  }
+
+  endSearch() {
+    this.setState({searchButtonDisabled: false});
+  }
+
   render() {
     return (
         <div>
             <div>
-                <SearchFilter updateChartDataCallback={this.updateChartData} />
+                <SearchFilter 
+                  updateChartDataCallback={this.updateChartData} 
+                  beginSearchCallback={this.beginSearch} 
+                  endSearchCallback={this.endSearch} 
+                  searchButtonDisabled={this.state.searchButtonDisabled} 
+                />
             </div>
             <div>
-                <StackedColumn chartData={this.state.chartData} />
+              {this.state.searchButtonDisabled
+                ?
+                <CircularProgress />
+                :
+                <StackedColumn 
+                  chartData={this.state.chartData}
+                  beginSearchCallback={this.beginSearch}
+                  endSearchCallback={this.endSearch}
+                  searchButtonDisabled={this.state.searchButtonDisabled} 
+                />
+              }
             </div>
         </div>
     );
