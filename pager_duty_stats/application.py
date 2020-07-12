@@ -56,5 +56,12 @@ def chart():
         max_incident_types=10,
         aggregation_types=[AggregationType.SERVICE_NAME]
     )
-    
-    return jsonify(format_series_from_stats(stats))
+
+    return jsonify(
+        format_series_from_stats(
+            start_date=chart_request.start_date,
+            end_date=chart_request.end_date,
+            stats_map=stats,
+            aggregation_type=AggregationType.SERVICE_NAME
+        )
+    )

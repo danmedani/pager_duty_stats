@@ -1,3 +1,5 @@
+import json
+from functools import lru_cache
 from datetime import datetime
 from datetime import timedelta
 from typing import Dict
@@ -20,6 +22,18 @@ class InvalidServiceException(Exception):
 class InvalidApiKeyException(Exception):
     pass
 
+incident_chunk_cache = {}
+
+def hash_incident_chunk(
+    pd_api_key: str,
+    service_ids: List[str],
+    start_date: str,
+    end_date: str,
+    limit: int,
+    offset: int
+) -> str:
+    return pd_api_key + '|' + ''.join(service_ids) + '|' + start_date + '|' + end_date + '|' + str(limit) + '|' + str(offset)
+
 
 def fetch_incident_chunk(
     pd_api_key: str,
@@ -29,6 +43,18 @@ def fetch_incident_chunk(
     limit: int,
     offset: int
 ) -> List[Dict]:
+    global incident_chunk_cache
+    hash_val = hash_incident_chunk(
+        pd_api_key,
+        service_ids,
+        start_date,
+        end_date,
+        limit,
+        offset
+    )
+    if hash_val in incident_chunk_cache:
+        return incident_chunk_cache[hash_val]
+
     headers = {
         'Authorization': 'Token token={api_key}'.format(api_key=pd_api_key),
         'Content-Type': 'application/json',
@@ -50,6 +76,7 @@ def fetch_incident_chunk(
     if r.status_code == 404:
         raise InvalidApiKeyException('404 from PagerDuty. Double check your api key')
 
+    incident_chunk_cache[hash_val] = r.json()['incidents']
     return r.json()['incidents']
 
 
@@ -74,6 +101,7 @@ def fetch_all_incidents(
             limit=FETCH_LIMIT,
             offset=offset
         )
+        print(json.dumps(incidents))
         if len(incidents) == 0:
             break
         all_incidents += incidents

@@ -19,7 +19,7 @@ var blankChart = {
         show: true
       },
       zoom: {
-        enabled: true
+        enabled: false
       }
     },
     responsive: [{
@@ -38,8 +38,9 @@ var blankChart = {
       },
     },
     xaxis: {
-      type: 'datetime',
-      categories: []
+      type: 'category',
+      categories: [],
+      tickPlacement: 'on'
     },
     legend: {
       position: 'right',
