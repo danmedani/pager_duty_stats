@@ -13,7 +13,7 @@ from pager_duty_stats.logic.incident_types import ExtractionTechnique
 from pager_duty_stats.logic.aggregation import GroupingWindow
 from pager_duty_stats.formatter.series import format_series_from_stats
 
-app = Flask(__name__, static_folder='../ui/dist/', static_url_path='')
+application = Flask(__name__, static_folder='./ui/dist/', static_url_path='')
 
 class ChartRequest(NamedTuple):
     service_ids: List[str]
@@ -33,12 +33,12 @@ def parse_chart_request(request_json: Dict) -> ChartRequest:
     )
 
 
-@app.route('/')
+@application.route('/')
 def index():
-    return app.send_static_file('chart.html')
+    return application.send_static_file('chart.html')
 
 
-@app.route('/api/chart', methods=['POST'])
+@application.route('/api/chart', methods=['POST'])
 def chart():
     chart_request = parse_chart_request(request.json)
     incidents = fetch_all_incidents(
@@ -65,3 +65,7 @@ def chart():
             aggregation_type=AggregationType.SERVICE_NAME
         )
     )
+
+if __name__ == "__main__":
+    application.debug = True
+    application.run()

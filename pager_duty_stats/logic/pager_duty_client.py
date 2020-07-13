@@ -68,7 +68,6 @@ def fetch_incident_chunk(
         'limit': str(limit),
         'offset': str(offset)
     }
-    print(params)
     r = requests.get(PAGER_DUTY_API, headers=headers, params=params)
 
     if r.status_code == 400:
@@ -101,7 +100,6 @@ def fetch_all_incidents(
             limit=FETCH_LIMIT,
             offset=offset
         )
-        print(json.dumps(incidents))
         if len(incidents) == 0:
             break
         all_incidents += incidents
