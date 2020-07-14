@@ -20,6 +20,7 @@ class ChartRequest(NamedTuple):
     start_date: str
     end_date: Optional[str]
     grouping_window: str
+    chart_type: str
 
     pd_api_key: str
 
@@ -29,6 +30,7 @@ def parse_chart_request(request_json: Dict) -> ChartRequest:
         start_date=request_json['start_date'],
         end_date=request_json['end_date'] or str(datetime.now().date()),
         grouping_window=request_json['grouping_window'],
+        chart_type=request_json['chart_type'],
         pd_api_key=request_json['pd_api_key']
     )
 
@@ -54,7 +56,7 @@ def chart():
         grouping_window=GroupingWindow.WEEK if chart_request.grouping_window == 'week' else GroupingWindow.DAY,
         incident_type_extraction_technique=ExtractionTechnique.YC,
         max_incident_types=10,
-        aggregation_types=[AggregationType.SERVICE_NAME]
+        aggregation_types=[AggregationType.SERVICE_NAME, AggregationType.TIME_OF_DAY]
     )
 
     return jsonify(
@@ -62,7 +64,7 @@ def chart():
             start_date=chart_request.start_date,
             end_date=chart_request.end_date,
             stats_map=stats,
-            aggregation_type=AggregationType.SERVICE_NAME
+            aggregation_type=AggregationType.SERVICE_NAME if chart_request.chart_type == 'serviceName' else AggregationType.TIME_OF_DAY
         )
     )
 

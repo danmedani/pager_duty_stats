@@ -7,6 +7,7 @@ class SearchFilter extends React.Component {
 
     this.state = {
       groupingWindow: 'day',
+      chartType: 'serviceName',
       loadingData: false,
       startDate: '2020-05-01',
       endDate: null,
@@ -38,6 +39,7 @@ class SearchFilter extends React.Component {
       'start_date': this.state.startDate,
       'end_date': this.state.endDate,
       'grouping_window': this.state.groupingWindow,
+      'chart_type': this.state.chartType,
       'pd_api_key': this.state.pdApiKey,
     };
     this.props.beginSearchCallback();
@@ -117,6 +119,10 @@ class SearchFilter extends React.Component {
         <RadioGroup aria-label="Grouping Window" name="groupingWindow" value={this.state.groupingWindow} onChange={this.handleInputChange}>
           <FormControlLabel value="day" control={<Radio />} label="Day" />
           <FormControlLabel value="week" control={<Radio />} label="Week" />
+        </RadioGroup>
+        <RadioGroup aria-label="Chart Type" name="chartType" value={this.state.chartType} onChange={this.handleInputChange}>
+          <FormControlLabel value="serviceName" control={<Radio />} label="By Service Name" />
+          <FormControlLabel value="timeOfDay" control={<Radio />} label="By Time of Day" />
         </RadioGroup>
         <Button variant="contained" color="primary" onClick={() => this.fetchData()} disabled={this.props.searchButtonDisabled}>
           Search
