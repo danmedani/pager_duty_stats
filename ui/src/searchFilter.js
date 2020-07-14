@@ -42,7 +42,7 @@ class SearchFilter extends React.Component {
     };
     this.props.beginSearchCallback();
     fetch(
-      'http://pagerdutystats-env.eba-pf8bvutt.us-east-2.elasticbeanstalk.com/api/chart',
+      '/api/chart',
       {
         method: 'POST',
         headers: {
