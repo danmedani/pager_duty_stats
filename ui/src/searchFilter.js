@@ -123,6 +123,7 @@ class SearchFilter extends React.Component {
         <RadioGroup aria-label="Chart Type" name="chartType" value={this.state.chartType} onChange={this.handleInputChange}>
           <FormControlLabel value="serviceName" control={<Radio />} label="By Service Name" />
           <FormControlLabel value="timeOfDay" control={<Radio />} label="By Time of Day" />
+          <FormControlLabel value="type" control={<Radio />} label="By Type" />
         </RadioGroup>
         <Button variant="contained" color="primary" onClick={() => this.fetchData()} disabled={this.props.searchButtonDisabled}>
           Search

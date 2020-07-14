@@ -13,10 +13,9 @@ var blankChart = {
   options: {
     chart: {
       type: 'bar',
-      height: 350,
       stacked: true,
       toolbar: {
-        show: true
+        show: false
       },
       zoom: {
         enabled: false
@@ -43,8 +42,7 @@ var blankChart = {
       tickPlacement: 'on'
     },
     legend: {
-      position: 'right',
-      offsetY: 40
+      position: 'bottom'
     },
     fill: {
       opacity: 1

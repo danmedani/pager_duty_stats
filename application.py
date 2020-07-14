@@ -56,7 +56,11 @@ def chart():
         grouping_window=GroupingWindow.WEEK if chart_request.grouping_window == 'week' else GroupingWindow.DAY,
         incident_type_extraction_technique=ExtractionTechnique.YC,
         max_incident_types=10,
-        aggregation_types=[AggregationType.SERVICE_NAME, AggregationType.TIME_OF_DAY]
+        aggregation_types=[
+            AggregationType.SERVICE_NAME, 
+            AggregationType.TIME_OF_DAY, 
+            AggregationType.CUSTOM_INCIDENT_TYPE
+        ]
     )
 
     return jsonify(
@@ -64,7 +68,7 @@ def chart():
             start_date=chart_request.start_date,
             end_date=chart_request.end_date,
             stats_map=stats,
-            aggregation_type=AggregationType.SERVICE_NAME if chart_request.chart_type == 'serviceName' else AggregationType.TIME_OF_DAY
+            aggregation_type=AggregationType.SERVICE_NAME if chart_request.chart_type == 'serviceName' else AggregationType.TIME_OF_DAY if chart_request.chart_type == 'timeOfDay' else AggregationType.CUSTOM_INCIDENT_TYPE
         )
     )
 
