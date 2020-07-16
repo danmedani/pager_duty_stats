@@ -11,8 +11,9 @@ import requests
 Useful reference: https://developer.pagerduty.com/api-reference/
 """
 
-PAGER_DUTY_API = 'https://api.pagerduty.com/incidents'
+PAGER_DUTY_API = 'https://api.pagerduty.com/'
 FETCH_LIMIT = 100
+TEAM_FETCH_LIMIT = 25
 
 
 class InvalidServiceException(Exception):
@@ -68,7 +69,7 @@ def fetch_incident_chunk(
         'limit': str(limit),
         'offset': str(offset)
     }
-    r = requests.get(PAGER_DUTY_API, headers=headers, params=params)
+    r = requests.get(PAGER_DUTY_API + 'incidents', headers=headers, params=params)
 
     if r.status_code == 400:
         raise InvalidServiceException('400 from PagerDuty. Make sure you have legit service_ids specified')
@@ -106,3 +107,84 @@ def fetch_all_incidents(
         offset += FETCH_LIMIT
 
     return all_incidents
+
+
+
+def fetch_teams_chunk(
+    pd_api_key: str,
+    limit: int,
+    offset: int
+) -> List[Dict]:
+    headers = {
+        'Authorization': 'Token token={api_key}'.format(api_key=pd_api_key),
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'From': 'dmedani@yelp.com'
+    }
+    params = {
+        'limit': str(limit),
+        'offset': str(offset)
+    }
+    r = requests.get(PAGER_DUTY_API + 'teams', headers=headers, params=params)
+
+    return r.json()['teams']
+
+
+def fetch_all_teams(
+    pd_api_key: str
+) -> List[Dict]:
+    all_teams = []
+    offset = 0
+    while True:
+        teams_chunk = fetch_teams_chunk(
+            pd_api_key=pd_api_key,
+            limit=TEAM_FETCH_LIMIT,
+            offset=offset
+        )
+        if len(teams_chunk) == 0:
+            break
+        all_teams += teams_chunk
+        offset += TEAM_FETCH_LIMIT
+
+    return all_teams
+
+
+
+
+def fetch_service_chunk(
+    pd_api_key: str,
+    limit: int,
+    offset: int
+) -> List[Dict]:
+    headers = {
+        'Authorization': 'Token token={api_key}'.format(api_key=pd_api_key),
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'From': 'dmedani@yelp.com'
+    }
+    params = {
+        'limit': str(limit),
+        'offset': str(offset)
+    }
+    r = requests.get(PAGER_DUTY_API + 'services', headers=headers, params=params)
+
+    return r.json()['services']
+
+
+def fetch_all_services(
+    pd_api_key: str
+) -> List[Dict]:
+    all_services = []
+    offset = 0
+    while True:
+        services_chunk = fetch_service_chunk(
+            pd_api_key=pd_api_key,
+            limit=TEAM_FETCH_LIMIT,
+            offset=offset
+        )
+        if len(services_chunk) == 0:
+            break
+        all_services += services_chunk
+        offset += TEAM_FETCH_LIMIT
+
+    return all_services

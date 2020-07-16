@@ -9,6 +9,8 @@ from pager_duty_stats.logic.aggregation import get_stats
 from pager_duty_stats.logic.aggregation import AggregationType
 from flask import jsonify
 from pager_duty_stats.logic.pager_duty_client import fetch_all_incidents
+from pager_duty_stats.logic.pager_duty_client import fetch_all_teams
+from pager_duty_stats.logic.pager_duty_client import fetch_all_services
 from pager_duty_stats.logic.incident_types import ExtractionTechnique
 from pager_duty_stats.logic.aggregation import GroupingWindow
 from pager_duty_stats.formatter.series import format_series_from_stats
@@ -71,6 +73,34 @@ def chart():
             aggregation_type=AggregationType.SERVICE_NAME if chart_request.chart_type == 'serviceName' else AggregationType.TIME_OF_DAY if chart_request.chart_type == 'timeOfDay' else AggregationType.CUSTOM_INCIDENT_TYPE
         )
     )
+
+
+
+@application.route('/api/teams', methods=['GET'])
+def teams():
+    return jsonify(
+        [
+            {
+                'id': team['id'],
+                'name': team['name'],
+            }
+            for team in fetch_all_teams(pd_api_key=request.args.get('pd_api_key'))
+        ]
+    )
+
+
+@application.route('/api/services', methods=['GET'])
+def services():
+    return jsonify(
+        [
+            {
+                'id': team['id'],
+                'name': team['name'],
+            }
+            for team in fetch_all_services(pd_api_key=request.args.get('pd_api_key'))
+        ]
+    )
+
 
 if __name__ == "__main__":
     application.debug = True

@@ -1,5 +1,7 @@
 import React from 'react';
 import { Button, FormControlLabel, Radio, RadioGroup, TextField } from '@material-ui/core';
+import Autocomplete from '@material-ui/lab/Autocomplete';
+
 
 class SearchFilter extends React.Component {
   constructor(props) {
@@ -12,11 +14,64 @@ class SearchFilter extends React.Component {
       startDate: '2020-05-01',
       endDate: null,
       serviceIds: 'P289YKV,PJQKKBU',
-      pdApiKey: ''
+      pdApiKey: '',
+      teams: [],
+      services: []
     };
+
+    setTimeout(() => {
+      fetch(
+        '/api/teams?pd_api_key=???'
+        )
+        .then(res => res.json())
+        .then(
+          (result) => {
+            this.setState(
+              {
+                teams: result
+              }
+            )
+          },
+          // Note: it's important to handle errors here
+          // instead of a catch() block so that we don't swallow
+          // exceptions from actual bugs in components.
+          (error) => {
+            this.setState({
+              loadingData: false,
+              error
+            });
+          }
+        )
+    }, 1)
+
+    setTimeout(() => {
+      fetch(
+        '/api/services?pd_api_key=???'
+        )
+        .then(res => res.json())
+        .then(
+          (result) => {
+            this.setState(
+              {
+                services: result
+              }
+            )
+          },
+          // Note: it's important to handle errors here
+          // instead of a catch() block so that we don't swallow
+          // exceptions from actual bugs in components.
+          (error) => {
+            this.setState({
+              loadingData: false,
+              error
+            });
+          }
+        )
+    }, 1)
 
     this.handleInputChange = this.handleInputChange.bind(this);
   }
+
 
 
   handleInputChange(event) {
@@ -45,14 +100,14 @@ class SearchFilter extends React.Component {
     this.props.beginSearchCallback();
     fetch(
       '/api/chart',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      }
-    )
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        }
+      )
       .then(res => res.json())
       .then(
         (result) => {
@@ -79,6 +134,26 @@ class SearchFilter extends React.Component {
   render() {
     return (
       <div id="searchFilter">
+        <Autocomplete
+          multiple
+          id="team-selector"
+          options={this.state.teams}
+          getOptionLabel={(team) => team.name}
+          style={{ width: 300 }}
+          renderInput={(params) => (
+            <TextField {...params} label="Select Team" variant="outlined" />
+          )}
+        />
+        <Autocomplete
+          multiple
+          id="team-selector"
+          options={this.state.services}
+          getOptionLabel={(service) => service.name}
+          style={{ width: 300 }}
+          renderInput={(params) => (
+            <TextField {...params} label="Select Service" variant="outlined" />
+          )}
+        />
         <TextField 
           id="outlined-basic" 
           label="Service IDs" 
