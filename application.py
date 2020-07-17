@@ -39,7 +39,7 @@ def parse_chart_request(request_json: Dict) -> ChartRequest:
 
 @application.route('/')
 def index():
-    return application.send_static_file('chart.html')
+    return application.send_static_file('index.html')
 
 
 @application.route('/api/chart', methods=['POST'])

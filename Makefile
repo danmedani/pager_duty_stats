@@ -46,7 +46,7 @@ webpack:
 
 .PHONY: webpackdev
 webpackdev:
-	npx webpack --mode development --config ui/webpack.config.js
+	npx webpack --mode development --config ui/webpack.config.dev.js
 
 .PHONY: web
 web: webpackdev
@@ -55,3 +55,8 @@ web: webpackdev
 .PHONY: justweb
 justweb: 
 	uwsgi --http 127.0.0.1:3031 --wsgi-file application.py --callable application --processes 4 --threads 2 --stats 127.0.0.1:9191
+
+.PHONY: package
+package: build webpack
+	eb deploy
+	eb open

@@ -12,67 +12,20 @@ class SearchFilter extends React.Component {
       chartType: 'serviceName',
       loadingData: false,
       startDate: '2020-05-01',
-      endDate: null,
-      serviceIds: 'P289YKV,PJQKKBU',
-      pdApiKey: '',
-      teams: [],
+      endDate: '',
       services: []
     };
 
-    setTimeout(() => {
-      fetch(
-        '/api/teams?pd_api_key=???'
-        )
-        .then(res => res.json())
-        .then(
-          (result) => {
-            this.setState(
-              {
-                teams: result
-              }
-            )
-          },
-          // Note: it's important to handle errors here
-          // instead of a catch() block so that we don't swallow
-          // exceptions from actual bugs in components.
-          (error) => {
-            this.setState({
-              loadingData: false,
-              error
-            });
-          }
-        )
-    }, 1)
-
-    setTimeout(() => {
-      fetch(
-        '/api/services?pd_api_key=???'
-        )
-        .then(res => res.json())
-        .then(
-          (result) => {
-            this.setState(
-              {
-                services: result
-              }
-            )
-          },
-          // Note: it's important to handle errors here
-          // instead of a catch() block so that we don't swallow
-          // exceptions from actual bugs in components.
-          (error) => {
-            this.setState({
-              loadingData: false,
-              error
-            });
-          }
-        )
-    }, 1)
-
     this.handleInputChange = this.handleInputChange.bind(this);
+    this.onServicesChange = this.onServicesChange.bind(this);
   }
 
-
+  onServicesChange(event, values) {
+    console.log(values);
+    this.setState({
+      services: values
+    });
+  }
 
   handleInputChange(event) {
     const target = event.target;
@@ -90,12 +43,12 @@ class SearchFilter extends React.Component {
     });
 
     var data = {
-      'service_ids': this.state.serviceIds,
+      'service_ids': this.state.services.map(service => service.id).join(','),
       'start_date': this.state.startDate,
       'end_date': this.state.endDate,
       'grouping_window': this.state.groupingWindow,
       'chart_type': this.state.chartType,
-      'pd_api_key': this.state.pdApiKey,
+      'pd_api_key': this.props.pdApiKey,
     };
     this.props.beginSearchCallback();
     fetch(
@@ -137,38 +90,25 @@ class SearchFilter extends React.Component {
         <Autocomplete
           multiple
           id="team-selector"
-          options={this.state.teams}
+          options={this.props.teams}
           getOptionLabel={(team) => team.name}
           style={{ width: 300 }}
           renderInput={(params) => (
-            <TextField {...params} label="Select Team" variant="outlined" />
+            <TextField {...params} label="Select Team(s)" variant="outlined" />
           )}
+          disabled={!this.props.teams}
         />
         <Autocomplete
           multiple
-          id="team-selector"
-          options={this.state.services}
+          id="services-selector"
+          options={this.props.services}
           getOptionLabel={(service) => service.name}
           style={{ width: 300 }}
           renderInput={(params) => (
-            <TextField {...params} label="Select Service" variant="outlined" />
+            <TextField {...params} label="Select Service(s)" variant="outlined" />
           )}
-        />
-        <TextField 
-          id="outlined-basic" 
-          label="Service IDs" 
-          variant="outlined" 
-          name="serviceIds"
-          value={this.state.serviceIds} 
-          onChange={this.handleInputChange} 
-        />
-        <TextField 
-          id="outlined-basic" 
-          label="Api Key" 
-          variant="outlined" 
-          name="pdApiKey"
-          value={this.state.pdApiKey} 
-          onChange={this.handleInputChange} 
+          disabled={!this.props.services}
+          onChange={this.onServicesChange}
         />
         <TextField
           id="date"
