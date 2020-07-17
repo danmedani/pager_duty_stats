@@ -17,11 +17,12 @@
 
 #pdApiKey {
     display: flex;
+    justify-content: space-around;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    height: 500px;
+    height: 250px;
     border: 0px solid green;
+    margin-top: 200px;
 }
 
 .long_text_field {
@@ -30,4 +31,8 @@
 
 .errorMsg {
     color: red;
+}
+
+.title {
+    font-size: 200%;
 }

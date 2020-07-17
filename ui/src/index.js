@@ -119,13 +119,8 @@ class ChartPage extends React.Component {
             ?
             <div id="pdApiKey">
               <div>
-                <p>
+                <p className="title">
                   Enter PagerDuty API Key
-                </p>
-              </div>
-              <div>
-                <p>
-                  We do not save your key. PagerDuty OAuth coming soon!
                 </p>
               </div>
               <div>
