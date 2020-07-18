@@ -18,7 +18,8 @@ from pager_duty_stats.formatter.series import format_series_from_stats
 application = Flask(__name__, static_folder='./ui/dist/', static_url_path='')
 
 class ChartRequest(NamedTuple):
-    service_ids: List[str]
+    service_ids: Optional[List[str]]
+    team_ids: Optional[List[str]]
     start_date: str
     end_date: Optional[str]
     grouping_window: str
@@ -28,7 +29,8 @@ class ChartRequest(NamedTuple):
 
 def parse_chart_request(request_json: Dict) -> ChartRequest:
     return ChartRequest(
-        service_ids=request_json['service_ids'].split(','),
+        service_ids=request_json['service_ids'].split(',') if 'service_ids' in request_json else None,
+        team_ids=request_json['team_ids'].split(',') if 'team_ids' in request_json else None,
         start_date=request_json['start_date'],
         end_date=request_json['end_date'] or str(datetime.now().date()),
         grouping_window=request_json['grouping_window'],
@@ -48,6 +50,7 @@ def chart():
     incidents = fetch_all_incidents(
         pd_api_key=chart_request.pd_api_key, # todo: make this betterer
         service_ids=chart_request.service_ids,
+        team_ids=chart_request.team_ids,
         start_date=chart_request.start_date,
         end_date=chart_request.end_date
     )

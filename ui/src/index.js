@@ -27,6 +27,11 @@ class ChartPage extends React.Component {
     this.beginSearch = this.beginSearch.bind(this);
     this.endSearch = this.endSearch.bind(this);
     this.updateChartData = this.updateChartData.bind(this);
+
+    var existingApiKey = localStorage.getItem('pd_api_key') || '';
+    if (existingApiKey !== '') {
+        this.state.pdApiKey = existingApiKey;
+    }
   }
 
   updateChartData(chartDataFromSearch) {
@@ -65,6 +70,8 @@ class ChartPage extends React.Component {
           )
           
           // looks like the api key worked out. let's go grab the services (this can take a while)
+          // Let's save the api key to local storage...
+          localStorage.setItem('pd_api_key', this.state.pdApiKey);
           fetch(
             '/api/services?pd_api_key=' + this.state.pdApiKey
             )

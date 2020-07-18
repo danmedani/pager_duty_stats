@@ -49,7 +49,7 @@ webpackdev:
 	npx webpack --mode development --config ui/webpack.config.dev.js
 
 .PHONY: web
-web: webpackdev
+web: webpack
 	uwsgi --http 127.0.0.1:3031 --wsgi-file application.py --callable application --processes 4 --threads 2 --stats 127.0.0.1:9191
 
 .PHONY: justweb
