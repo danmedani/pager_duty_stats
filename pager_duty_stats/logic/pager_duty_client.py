@@ -1,5 +1,3 @@
-import json
-from functools import lru_cache
 from datetime import datetime
 from datetime import timedelta
 from typing import Dict
@@ -17,12 +15,14 @@ TEAM_FETCH_LIMIT = 25
 
 services_chunk_cache = {}
 
+
 class InvalidServiceException(Exception):
     pass
 
 
 class InvalidApiKeyException(Exception):
     pass
+
 
 def fetch_incident_chunk(
     pd_api_key: str,
@@ -47,7 +47,7 @@ def fetch_incident_chunk(
     }
     if service_ids:
         params['service_ids[]'] = service_ids
-    
+
     if team_ids:
         params['team_ids[]'] = team_ids
 
@@ -92,7 +92,6 @@ def fetch_all_incidents(
     return all_incidents
 
 
-
 def fetch_teams_chunk(
     pd_api_key: str,
     limit: int,
@@ -130,8 +129,6 @@ def fetch_all_teams(
         offset += TEAM_FETCH_LIMIT
 
     return all_teams
-
-
 
 
 def fetch_service_chunk(

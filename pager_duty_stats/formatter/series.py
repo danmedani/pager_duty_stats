@@ -6,9 +6,11 @@ from pager_duty_stats.logic.aggregation import AggregrateStats
 from pager_duty_stats.logic.csv_printer import get_aggregation_type_values
 from pager_duty_stats.logic.aggregation import AggregationType
 
+
 class SeriesRow(TypedDict):
     name: str
     data: List[int]
+
 
 class SeriesResponse(TypedDict):
     xaxis: List[str]
@@ -27,7 +29,7 @@ def extract_aggregation(
     aggregation_type: AggregationType,
     aggregation_values: List[str],
     stats_map: Dict[str, AggregrateStats],
-    start_date: str, 
+    start_date: str,
     end_date: str
 ) -> List[SeriesRow]:
     aggregation = []
@@ -43,6 +45,7 @@ def extract_aggregation(
                 )
         aggregation.append(series_row)
     return aggregation
+
 
 def format_series_from_stats(
     aggregation_type: AggregationType,
@@ -60,20 +63,8 @@ def format_series_from_stats(
         series=extract_aggregation(
             aggregation_type=aggregation_type,
             aggregation_values=aggregation_values[aggregation_type],
-            stats_map=stats_map,            
+            stats_map=stats_map,
             start_date=start_date,
             end_date=end_date
         )
     )
-
-
-# [
-#     SeriesRow(
-#         name='Yelp Connect Low Urgency',
-#         data=[1, 4, 7, 12]
-#     ),
-#     SeriesRow(
-#         name='Yelp Connect Critical Urgency',
-#         data=[0, 2, 1, 5]
-#     )
-# ]
