@@ -60,7 +60,7 @@ def chart():
         end_date=chart_request.end_date,
         grouping_window=GroupingWindow.WEEK if chart_request.grouping_window == 'week' else GroupingWindow.DAY,
         incident_type_extraction_technique=ExtractionTechnique.YC,
-        max_incident_types=10,
+        max_incident_types=25,
         aggregation_types=[
             AggregationType.SERVICE_NAME, 
             AggregationType.TIME_OF_DAY, 

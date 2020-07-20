@@ -170,7 +170,9 @@ class ChartPage extends React.Component {
               <div>
                 {this.state.searchButtonDisabled
                   ?
-                  <CircularProgress />
+                  <div id="circularProgress">
+                    <CircularProgress />
+                  </div>
                   :
                   <StackedColumn 
                     chartData={this.state.chartData}
