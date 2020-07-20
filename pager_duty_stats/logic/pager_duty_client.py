@@ -13,7 +13,7 @@ PAGER_DUTY_API = 'https://api.pagerduty.com/'
 FETCH_LIMIT = 100
 TEAM_FETCH_LIMIT = 25
 
-services_chunk_cache = {}
+services_chunk_cache: Dict[str, List[Dict]] = {}
 
 
 class InvalidServiceException(Exception):
@@ -46,10 +46,10 @@ def fetch_incident_chunk(
         'offset': str(offset)
     }
     if service_ids:
-        params['service_ids[]'] = service_ids
+        params['service_ids[]'] = service_ids  # type: ignore
 
     if team_ids:
-        params['team_ids[]'] = team_ids
+        params['team_ids[]'] = team_ids  # type: ignore
 
     r = requests.get(PAGER_DUTY_API + 'incidents', headers=headers, params=params)
 

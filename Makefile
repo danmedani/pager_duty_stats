@@ -24,13 +24,13 @@ mypy:
 .PHONY: test
 test: build lint mypy
 	coverage run --source pager_duty_stats -m pytest tests
-	coverage report -m --fail-under=100
+	coverage report -m --fail-under=90
 
 # Not building beforehand makes testing in dev faster
 .PHONY: tst
 tst: lint mypy
 	coverage run --source pager_duty_stats -m pytest tests
-	coverage report -m --fail-under=100
+	coverage report -m --fail-under=90
 
 .PHONY: lint
 lint: 
