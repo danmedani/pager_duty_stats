@@ -24,13 +24,13 @@ mypy:
 .PHONY: test
 test: build lint mypy
 	coverage run --source pager_duty_stats -m pytest tests
-	coverage report -m --fail-under=100
+	coverage report -m --fail-under=90
 
 # Not building beforehand makes testing in dev faster
 .PHONY: tst
 tst: lint mypy
 	coverage run --source pager_duty_stats -m pytest tests
-	coverage report -m --fail-under=100
+	coverage report -m --fail-under=90
 
 .PHONY: lint
 lint: 
@@ -38,3 +38,24 @@ lint:
 	@find pager_duty_stats tests -name *.py -exec reorder-python-imports {} +
 	@echo "    ----    Running linter    ----    "
 	@flake8 --config .flake8 pager_duty_stats/ tests/
+
+.PHONY: webpack
+webpack:
+	npx webpack --mode production --config ui/webpack.config.js
+
+.PHONY: webpackdev
+webpackdev:
+	npx webpack --mode development --config ui/webpack.config.dev.js
+
+.PHONY: web
+web: webpack
+	uwsgi --http 127.0.0.1:3031 --wsgi-file application.py --callable application --processes 4 --threads 2 --stats 127.0.0.1:9191
+
+.PHONY: justweb
+justweb: 
+	uwsgi --http 127.0.0.1:3031 --wsgi-file application.py --callable application --processes 4 --threads 2 --stats 127.0.0.1:9191
+
+.PHONY: package
+package: build webpack
+	eb deploy
+	eb open

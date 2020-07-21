@@ -69,6 +69,7 @@ def run(args: List[str]):
     incidents = fetch_all_incidents(
         pd_api_key=get_pager_duty_api_key(options.pd_key_file),
         service_ids=options.service_ids,
+        team_ids=[],
         start_date=options.start_date,
         end_date=options.end_date
     )

@@ -1,0 +1,59 @@
+#search_bar {
+  display: flex;
+  justify-content: center;
+  width: 70%;
+  margin: auto;
+}
+
+#search_bar div {
+  margin: auto;
+}
+
+#chart {
+  width: 60%;
+  margin: auto;
+  text-align: center;
+}
+
+#pdApiKey {
+    display: flex;
+    justify-content: space-around;
+    flex-direction: column;
+    align-items: center;
+    height: 250px;
+    margin-top: 200px;
+}
+
+.long_text_field {
+  size: 300px;
+}
+
+.errorMsg {
+    color: #eb5234;
+    font-size: 150%;
+}
+
+.title {
+    font-size: 200%;
+}
+
+#searchFilter {
+    display: flex;
+    justify-content: space-around;
+    flex-direction: row;
+    align-items: center;
+    height: 150px;
+    border-bottom: 1px solid green;
+    margin-top: 2   0px;
+}
+
+#searchFilterContainer {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+}
+
+#circularProgress {
+    text-align: center;
+    margin-top: 150px;
+}

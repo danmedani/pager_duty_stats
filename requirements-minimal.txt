@@ -7,3 +7,5 @@ coverage
 mock
 flake8
 reorder-python-imports
+uwsgi
+flask

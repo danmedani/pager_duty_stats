@@ -21,6 +21,7 @@ def test_fetch_incident_chunk_200(
     assert fetch_incident_chunk(
         pd_api_key='fake_api_key',
         service_ids=['serviceA', 'serviceB'],
+        team_ids=[],
         start_date='2020-01-01',
         end_date='2021-01-02',
         limit=100,
@@ -58,6 +59,7 @@ def test_fetch_incident_chunk_invalid_service(
         fetch_incident_chunk(
             pd_api_key='fake_api_key',
             service_ids=['serviceA', 'serviceB'],
+            team_ids=[],
             start_date='2020-01-01',
             end_date='2021-01-02',
             limit=100,
@@ -79,6 +81,7 @@ def test_fetch_incident_chunk_invalid_api_key(
         fetch_incident_chunk(
             pd_api_key='fake_api_key',
             service_ids=['serviceA', 'serviceB'],
+            team_ids=[],
             start_date='2020-01-01',
             end_date='2021-01-02',
             limit=100,
@@ -105,6 +108,7 @@ def test_fetch_all_incidents(
     assert fetch_all_incidents(
         pd_api_key='fake_api_key',
         service_ids=['serviceA', 'serviceB'],
+        team_ids=[],
         start_date='2020-01-01',
         end_date='2021-01-01'
     ) == [
@@ -118,6 +122,7 @@ def test_fetch_all_incidents(
         mock.call(
             pd_api_key='fake_api_key',
             service_ids=['serviceA', 'serviceB'],
+            team_ids=[],
             start_date='2020-01-01',
             end_date='2021-01-02',
             limit=100,
@@ -126,6 +131,7 @@ def test_fetch_all_incidents(
         mock.call(
             pd_api_key='fake_api_key',
             service_ids=['serviceA', 'serviceB'],
+            team_ids=[],
             start_date='2020-01-01',
             end_date='2021-01-02',
             limit=100,
@@ -134,6 +140,7 @@ def test_fetch_all_incidents(
         mock.call(
             pd_api_key='fake_api_key',
             service_ids=['serviceA', 'serviceB'],
+            team_ids=[],
             start_date='2020-01-01',
             end_date='2021-01-02',
             limit=100,
