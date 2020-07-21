@@ -5,6 +5,7 @@
 
 Aggregates PagerDuty incident statistics to help you figure out what's happening with your on-call.
 
+https://www.pagerdutystats.com
 
 # Auth
 Oauth is coming soon - for now you'll need to enter your PagerDuty API Token into the site. The website is totally stateless at this point, so we aren't saving any tokens on the backend.
