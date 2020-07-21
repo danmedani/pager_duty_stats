@@ -13,11 +13,12 @@ Oauth is coming soon - for now you'll need to enter your PagerDuty API Token int
 To generate an api token from PagerDuty, go to My Profile -> User Settings -> Create API User Token
 
 # Setting Up Dev Environment
-Steps to setting up dev environment (requires that you already have `git`, `npm`, and `python3`)
+Steps to setting up dev environment (you should already have `git`, `npm`, and `python3`)
 1) `git clone https://github.com/danmedani/pager_duty_stats.git`
 2) `cd pager_duty_stats/`
 3) `make init` (builds front and back ends)
-4) `make web` (launches site locally at `http://localhost:3031/`)
+4) `source virtual_env/bin/activate`
+5) `make web` (launches site locally at `http://localhost:3031/`)
 
 If you are working on the backend, it usually helps to be in the virtualenv:
 `source virtual_env/bin/activate`
