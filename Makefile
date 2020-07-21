@@ -58,7 +58,7 @@ webpackdev:
 # Run webserver in dev environment
 .PHONY: web
 web:
-	uwsgi --http 127.0.0.1:3031 --wsgi-file application.py --callable application --processes 4 --threads 2 --stats 127.0.0.1:9191
+	uwsgi --http 127.0.0.1:3031 --wsgi-file pager_duty_stats/application.py --callable application --processes 4 --threads 2 --stats 127.0.0.1:9191
 
 # Package the code up and deploy to aws
 .PHONY: package

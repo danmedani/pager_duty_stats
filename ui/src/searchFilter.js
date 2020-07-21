@@ -9,7 +9,7 @@ class SearchFilter extends React.Component {
 
     this.state = {
       groupingWindow: 'day',
-      chartType: 'serviceName',
+      chartType: 'SERVICE_NAME',
       loadingData: false,
       startDate: '2020-05-01',
       endDate: '',
@@ -159,9 +159,9 @@ class SearchFilter extends React.Component {
             <FormControlLabel value="week" control={<Radio />} label="Week" />
           </RadioGroup>
           <RadioGroup aria-label="Chart Type" name="chartType" value={this.state.chartType} onChange={this.handleInputChange}>
-            <FormControlLabel value="serviceName" control={<Radio />} label="By Service Name" />
-            <FormControlLabel value="timeOfDay" control={<Radio />} label="By Time of Day" />
-            <FormControlLabel value="type" control={<Radio />} label="By Type" />
+            <FormControlLabel value="SERVICE_NAME" control={<Radio />} label="By Service Name" />
+            <FormControlLabel value="TIME_OF_DAY" control={<Radio />} label="By Time of Day" />
+            <FormControlLabel value="CUSTOM_INCIDENT_TYPE" control={<Radio />} label="By Type" />
           </RadioGroup>
           <Button variant="contained" color="primary" onClick={() => this.fetchData()} disabled={this.props.searchButtonDisabled}>
             Search
