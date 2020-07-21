@@ -29,13 +29,13 @@ mypy:
 .PHONY: test
 test: build lint mypy
 	coverage run --source pager_duty_stats -m pytest tests
-	coverage report -m --fail-under=90
+	coverage report -m --fail-under=70
 
 # Run the full python test suite without first building.
 .PHONY: tst
 tst: lint mypy
 	coverage run --source pager_duty_stats -m pytest tests
-	coverage report -m --fail-under=90
+	coverage report -m --fail-under=70
 
 # Run linter
 .PHONY: lint
@@ -63,5 +63,5 @@ web:
 # Package the code up and deploy to aws
 .PHONY: package
 package: build webpack
-	eb deploy
-	eb open
+	eb deploy PagerDutyStats-env
+	eb open PagerDutyStats-env
