@@ -1,10 +1,12 @@
-from typing_extensions import TypedDict
-from typing import List
 from typing import Dict
-from pager_duty_stats.logic.util.dates import step_through_dates
-from pager_duty_stats.logic.aggregation import AggregrateStats
-from pager_duty_stats.logic.csv_printer import get_aggregation_type_values
+from typing import List
+from typing import Set
+
+from typing_extensions import TypedDict
+
 from pager_duty_stats.logic.aggregation import AggregationType
+from pager_duty_stats.logic.aggregation import AggregrateStats
+from pager_duty_stats.logic.util.dates import step_through_dates
 
 
 class SeriesRow(TypedDict):
@@ -15,6 +17,27 @@ class SeriesRow(TypedDict):
 class SeriesResponse(TypedDict):
     xaxis: List[str]
     series: List[SeriesRow]
+
+
+def get_aggregation_type_values(
+    stats: Dict[str, AggregrateStats],
+    aggregation_types: List[AggregationType]
+) -> Dict[AggregationType, List[str]]:
+    aggregation_type_values: Dict[AggregationType, Set[str]] = {
+        aggregation_type: set()
+        for aggregation_type in aggregation_types
+    }
+
+    for _, aggregation_stats in stats.items():
+        for aggregation_type in aggregation_types:
+            for name, _ in aggregation_stats['aggregations'][aggregation_type].items():
+                aggregation_type_values[aggregation_type].add(name)
+
+    # listify and sort the sets
+    return {
+        aggregation_type: sorted(list(aggregation_type_values[aggregation_type]))
+        for aggregation_type in aggregation_types
+    }
 
 
 def get_xaxis(start_date: str, end_date: str, stats_map: Dict[str, AggregrateStats],) -> List[str]:
