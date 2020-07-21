@@ -2,7 +2,7 @@
 .PHONY: init
 init: build
 	npm install webpack-cli
-	webpack
+	make webpack
 
 
 # Run webserver in dev environment
