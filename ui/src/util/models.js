@@ -22,6 +22,24 @@ var blankChart = {
         }
       }
     }],
+    title: {
+      text: 'Incident Counts',
+      align: 'center',
+      floating: true
+    },
+    tooltip: {
+      theme: 'dark',
+      x: {
+        show: false
+      },
+      y: {
+        title: {
+          formatter: function () {
+            return ''
+          }
+        }
+      }
+    },
     plotOptions: {
       bar: {
         horizontal: false,
@@ -30,7 +48,15 @@ var blankChart = {
     xaxis: {
       type: 'category',
       categories: [],
-      tickPlacement: 'on'
+      tickPlacement: 'on',
+      title: {
+        text: 'Date'
+      }
+    },
+    yaxis: {
+      title: {
+        text: 'Incident Counts'
+      }
     },
     legend: {
       position: 'bottom'

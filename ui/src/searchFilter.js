@@ -89,7 +89,7 @@ class SearchFilter extends React.Component {
             loadingData: false,
             items: result.items
           });
-          this.props.updateChartDataCallback(result);
+          this.props.updateChartDataCallback(result, this.state.chartType);
           this.props.endSearchCallback();
         },
         // Note: it's important to handle errors here

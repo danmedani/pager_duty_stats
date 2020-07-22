@@ -9,6 +9,12 @@ import { blankChart } from './util/models'
 
 const e = React.createElement;
 
+const chartTitleMap = {
+    'SERVICE_NAME': 'by Service Name',
+    'TIME_OF_DAY': 'by Time of Day',
+    'CUSTOM_INCIDENT_TYPE': 'by Type',
+}
+
 class ChartPage extends React.Component {
   constructor(props) {
     super(props);
@@ -34,10 +40,15 @@ class ChartPage extends React.Component {
     }
   }
 
-  updateChartData(chartDataFromSearch) {
+  getChartTitle(chartType) {
+    return 'Incident Counts, ' + chartTitleMap[chartType];
+  }
+
+  updateChartData(chartDataFromSearch, chartType) {
     var chartData = JSON.parse(JSON.stringify(blankChart));
     chartData.series = chartDataFromSearch.series;
     chartData.options.xaxis.categories = chartDataFromSearch.xaxis;
+    chartData.options.title.text = this.getChartTitle(chartType);
     this.setState({chartData: chartData});
   }
 
@@ -158,7 +169,7 @@ class ChartPage extends React.Component {
             <div>
               <div>
                   <SearchFilter 
-                    updateChartDataCallback={this.updateChartData} 
+                    updateChartDataCallback={this.updateChartData}
                     beginSearchCallback={this.beginSearch}
                     endSearchCallback={this.endSearch} 
                     searchButtonDisabled={this.state.searchButtonDisabled} 
