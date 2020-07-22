@@ -185,7 +185,7 @@ class ChartPage extends React.Component {
               <div>
                 {this.state.searchButtonDisabled
                   ?
-                  <div class="graphArea">
+                  <div className="graphArea">
                     <CircularProgress />
                   </div>
                   :
@@ -198,7 +198,7 @@ class ChartPage extends React.Component {
                       searchButtonDisabled={this.state.searchButtonDisabled} 
                     />
                     :
-                    <div class="graphArea">
+                    <div className="graphArea">
                       Patiently awaiting your search...
                     </div>
                 }

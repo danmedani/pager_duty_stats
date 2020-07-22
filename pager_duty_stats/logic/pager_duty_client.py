@@ -14,7 +14,7 @@ FETCH_LIMIT = 100
 TEAM_FETCH_LIMIT = 25
 
 services_chunk_cache: Dict[str, List[Dict]] = {}
-
+teams_chunk_cache: Dict[str, List[Dict]] = {}
 
 class InvalidServiceException(Exception):
     pass
@@ -115,6 +115,10 @@ def fetch_teams_chunk(
 def fetch_all_teams(
     pd_api_key: str
 ) -> List[Dict]:
+    global teams_chunk_cache
+    if pd_api_key in teams_chunk_cache:
+        return teams_chunk_cache[pd_api_key]
+
     all_teams = []
     offset = 0
     while True:
@@ -128,6 +132,7 @@ def fetch_all_teams(
         all_teams += teams_chunk
         offset += TEAM_FETCH_LIMIT
 
+    teams_chunk_cache[pd_api_key] = all_teams
     return all_teams
 
 

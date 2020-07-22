@@ -77,8 +77,8 @@ lint:
 	@flake8 --config .flake8 pager_duty_stats/ tests/
 
 
-# Package the code up and deploy to aws
-.PHONY: package
-package: build webpack
+# Package up the code up and deploy to aws
+.PHONY: deploy
+deploy: build webpack
 	eb deploy PagerDutyStats-env
 	eb open PagerDutyStats-env
