@@ -5,6 +5,8 @@ from typing import List
 
 import requests
 
+from pager_duty_stats.logic.util.dates import step_through_weeks
+
 """
 Useful reference: https://developer.pagerduty.com/api-reference/
 """
@@ -15,6 +17,7 @@ TEAM_FETCH_LIMIT = 25
 
 services_chunk_cache: Dict[str, List[Dict]] = {}
 teams_chunk_cache: Dict[str, List[Dict]] = {}
+
 
 class InvalidServiceException(Exception):
     pass
@@ -73,21 +76,22 @@ def fetch_all_incidents(
     # pagerduty api defaults to exclusive end-date (it uses 00:00 of the date). add a day to compensate
     end_date_plus_one = str((datetime.strptime(end_date, '%Y-%m-%d') + timedelta(days=1)).date())
 
-    offset = 0
-    while True:
-        incidents = fetch_incident_chunk(
-            pd_api_key=pd_api_key,
-            service_ids=service_ids,
-            team_ids=team_ids,
-            start_date=start_date,
-            end_date=end_date_plus_one,
-            limit=FETCH_LIMIT,
-            offset=offset
-        )
-        if len(incidents) == 0:
-            break
-        all_incidents += incidents
-        offset += FETCH_LIMIT
+    for start, end in step_through_weeks(start_date, end_date_plus_one):
+        offset = 0
+        while True:
+            incidents = fetch_incident_chunk(
+                pd_api_key=pd_api_key,
+                service_ids=service_ids,
+                team_ids=team_ids,
+                start_date=start,
+                end_date=end,
+                limit=FETCH_LIMIT,
+                offset=offset
+            )
+            if len(incidents) == 0:
+                break
+            all_incidents += incidents
+            offset += FETCH_LIMIT
 
     return all_incidents
 

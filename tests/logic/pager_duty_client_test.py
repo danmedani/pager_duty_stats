@@ -110,7 +110,7 @@ def test_fetch_all_incidents(
         service_ids=['serviceA', 'serviceB'],
         team_ids=[],
         start_date='2020-01-01',
-        end_date='2021-01-01'
+        end_date='2020-01-04'
     ) == [
         {'title': 'incident A'},
         {'title': 'incident B'},
@@ -124,7 +124,7 @@ def test_fetch_all_incidents(
             service_ids=['serviceA', 'serviceB'],
             team_ids=[],
             start_date='2020-01-01',
-            end_date='2021-01-02',
+            end_date='2020-01-05',
             limit=100,
             offset=0
         ),
@@ -133,7 +133,7 @@ def test_fetch_all_incidents(
             service_ids=['serviceA', 'serviceB'],
             team_ids=[],
             start_date='2020-01-01',
-            end_date='2021-01-02',
+            end_date='2020-01-05',
             limit=100,
             offset=100
         ),
@@ -142,7 +142,7 @@ def test_fetch_all_incidents(
             service_ids=['serviceA', 'serviceB'],
             team_ids=[],
             start_date='2020-01-01',
-            end_date='2021-01-02',
+            end_date='2020-01-05',
             limit=100,
             offset=200
         )
