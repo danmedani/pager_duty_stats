@@ -1,6 +1,16 @@
 import React from 'react';
-import { Button, FormControlLabel, Radio, RadioGroup, TextField } from '@material-ui/core';
+import { Button, FormControlLabel, Radio, RadioGroup, TextField, ThemeProvider, createMuiTheme } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
+
+
+const theme = createMuiTheme({
+  typography: {
+    fontSize: 12,
+    fontFamily: [
+      '-apple-system'
+    ].join(','),
+  },
+});
 
 
 class SearchFilter extends React.Component {
@@ -10,6 +20,7 @@ class SearchFilter extends React.Component {
     this.state = {
       groupingWindow: 'day',
       chartType: 'SERVICE_NAME',
+      filterType: 'service',
       loadingData: false,
       startDate: '2020-05-01',
       endDate: '',
@@ -21,6 +32,7 @@ class SearchFilter extends React.Component {
     this.handleInputChange = this.handleInputChange.bind(this);
     this.onServicesChange = this.onServicesChange.bind(this);
     this.onTeamsChange = this.onTeamsChange.bind(this);
+    this.handleFilterTypeChange = this.handleFilterTypeChange.bind(this);
   }
 
   onServicesChange(event, values) {
@@ -33,6 +45,14 @@ class SearchFilter extends React.Component {
     this.setState({
       teams: values
     });
+  }
+
+  handleFilterTypeChange(event) {
+    this.setState({
+      teams: [],
+      services: [],
+    });
+    this.handleInputChange(event);
   }
 
   handleInputChange(event) {
@@ -58,10 +78,9 @@ class SearchFilter extends React.Component {
       'chart_type': this.state.chartType,
       'pd_api_key': this.props.pdApiKey,
     };
-    if (this.state.services.length > 0) {
+    if (this.state.filterType == 'service') {
         data.service_ids = this.state.services.map(service => service.id).join(',');
-    }
-    if (this.state.teams.length > 0) {
+    } else if (this.state.teams.length > 0) {
         data.team_ids = this.state.teams.map(team => team.id).join(',');
     }
     if (this.state.teams.length + this.state.services.length == 0) {
@@ -109,63 +128,77 @@ class SearchFilter extends React.Component {
     return (
       <div id="searchFilterContainer">
         <div id="searchFilter">
-          <Autocomplete
-            multiple
-            id="team-selector"
-            options={this.props.teams}
-            getOptionLabel={(team) => team.name}
-            style={{ width: 300 }}
-            renderInput={(params) => (
-              <TextField {...params} label="Select Team(s)" variant="outlined" />
-            )}
-            disabled={!this.props.teams}
-            onChange={this.onTeamsChange}
-          />
-          <Autocomplete
-            multiple
-            id="services-selector"
-            options={this.props.services}
-            getOptionLabel={(service) => service.name}
-            style={{ width: 300 }}
-            renderInput={(params) => (
-              <TextField {...params} label="Select Service(s)" variant="outlined" />
-            )}
-            disabled={!this.props.services}
-            onChange={this.onServicesChange}
-          />
-          <TextField
-            id="date"
-            label="Start Date"
-            type="date"
-            name="startDate"
-            value={this.state.startDate}
-            onChange={this.handleInputChange}
-            InputLabelProps={{
-                shrink: true,
-            }}
-          />
-          <TextField
-            id="date"
-            label="End Date"
-            type="date"
-            name="endDate"
-            onChange={this.handleInputChange}
-            InputLabelProps={{
-                shrink: true,
-            }}
-          />
-          <RadioGroup aria-label="Grouping Window" name="groupingWindow" value={this.state.groupingWindow} onChange={this.handleInputChange}>
-            <FormControlLabel value="day" control={<Radio />} label="Day" />
-            <FormControlLabel value="week" control={<Radio />} label="Week" />
-          </RadioGroup>
-          <RadioGroup aria-label="Chart Type" name="chartType" value={this.state.chartType} onChange={this.handleInputChange}>
-            <FormControlLabel value="SERVICE_NAME" control={<Radio />} label="By Service Name" />
-            <FormControlLabel value="TIME_OF_DAY" control={<Radio />} label="By Time of Day" />
-            <FormControlLabel value="CUSTOM_INCIDENT_TYPE" control={<Radio />} label="By Type" />
-          </RadioGroup>
-          <Button variant="contained" color="primary" onClick={() => this.fetchData()} disabled={this.props.searchButtonDisabled}>
-            Search
-          </Button>
+          <ThemeProvider theme={theme}>
+            <div >
+              <RadioGroup aria-label="Filter Type" name="filterType" value={this.state.filterType} onChange={this.handleFilterTypeChange}>
+                <FormControlLabel value="service" control={<Radio />} label="By Service" />
+                <FormControlLabel value="team" control={<Radio />} label="By Team" />
+              </RadioGroup>
+              {this.state.filterType == 'service'
+                ?
+                <Autocomplete
+                  multiple
+                  id="services-selector"
+                  options={this.props.services}
+                  getOptionLabel={(service) => service.name}
+                  style={{ width: 300 }}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Select Service(s)" variant="outlined" />
+                  )}
+                  disabled={!this.props.services}
+                  onChange={this.onServicesChange}
+                  value={this.state.services}
+                />
+                :
+                <Autocomplete
+                  multiple
+                  id="team-selector"
+                  options={this.props.teams}
+                  getOptionLabel={(team) => team.name}
+                  style={{ width: 300 }}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Select Team(s)" variant="outlined" />
+                  )}
+                  disabled={!this.props.teams}
+                  onChange={this.onTeamsChange}
+                  value={this.state.teams}
+                />
+              }
+            </div>
+            <TextField
+              id="date"
+              label="Start Date"
+              type="date"
+              name="startDate"
+              value={this.state.startDate}
+              onChange={this.handleInputChange}
+              InputLabelProps={{
+                  shrink: true,
+              }}
+            />
+            <TextField
+              id="date"
+              label="End Date"
+              type="date"
+              name="endDate"
+              onChange={this.handleInputChange}
+              InputLabelProps={{
+                  shrink: true,
+              }}
+            />
+            <RadioGroup aria-label="Grouping Window" name="groupingWindow" value={this.state.groupingWindow} onChange={this.handleInputChange}>
+              <FormControlLabel value="day" control={<Radio />} label="Day" />
+              <FormControlLabel value="week" control={<Radio />} label="Week" />
+            </RadioGroup>
+            <RadioGroup aria-label="Chart Type" name="chartType" value={this.state.chartType} onChange={this.handleInputChange}>
+              <FormControlLabel value="SERVICE_NAME" control={<Radio />} label="By Service Name" />
+              <FormControlLabel value="TIME_OF_DAY" control={<Radio />} label="By Time of Day" />
+              <FormControlLabel value="CUSTOM_INCIDENT_TYPE" control={<Radio />} label="By Type" />
+            </RadioGroup>
+            <Button type="submit" variant="contained" color="primary" onClick={() => this.fetchData()} disabled={this.props.searchButtonDisabled}>
+              Search
+            </Button>
+          </ThemeProvider>
         </div>
         <div className="errorMsg">
           {this.state.searchError && 
