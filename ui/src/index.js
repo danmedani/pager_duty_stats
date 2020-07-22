@@ -26,7 +26,8 @@ class ChartPage extends React.Component {
       gotLegitApiKey: false,
       pdApiKey: '',
       services: [],
-      teams: []
+      teams: [],
+      searched: false
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -49,7 +50,10 @@ class ChartPage extends React.Component {
     chartData.series = chartDataFromSearch.series;
     chartData.options.xaxis.categories = chartDataFromSearch.xaxis;
     chartData.options.title.text = this.getChartTitle(chartType);
-    this.setState({chartData: chartData});
+    this.setState({
+      chartData: chartData,
+      searched: true
+    });
   }
 
   beginSearch() {
@@ -181,16 +185,22 @@ class ChartPage extends React.Component {
               <div>
                 {this.state.searchButtonDisabled
                   ?
-                  <div id="circularProgress">
+                  <div class="graphArea">
                     <CircularProgress />
                   </div>
                   :
-                  <StackedColumn 
-                    chartData={this.state.chartData}
-                    beginSearchCallback={this.beginSearch}
-                    endSearchCallback={this.endSearch}
-                    searchButtonDisabled={this.state.searchButtonDisabled} 
-                  />
+                  this.state.searched
+                    ?
+                    <StackedColumn 
+                      chartData={this.state.chartData}
+                      beginSearchCallback={this.beginSearch}
+                      endSearchCallback={this.endSearch}
+                      searchButtonDisabled={this.state.searchButtonDisabled} 
+                    />
+                    :
+                    <div class="graphArea">
+                      Patiently awaiting your search...
+                    </div>
                 }
               </div>
             </div>

@@ -54,7 +54,7 @@
     flex-direction: column;
 }
 
-#circularProgress {
+.graphArea {
     text-align: center;
     margin-top: 150px;
 }
