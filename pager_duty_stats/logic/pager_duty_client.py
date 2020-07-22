@@ -5,7 +5,7 @@ from typing import List
 
 import requests
 
-from pager_duty_stats.logic.util.dates import step_through_weeks
+from pager_duty_stats.logic.util.dates import step_through_date_range_chunks
 
 """
 Useful reference: https://developer.pagerduty.com/api-reference/
@@ -25,6 +25,22 @@ class InvalidServiceException(Exception):
 
 class InvalidApiKeyException(Exception):
     pass
+
+
+def fetch_abilities(
+    pd_api_key: str,
+) -> List[str]:
+    headers = {
+        'Authorization': 'Token token={api_key}'.format(api_key=pd_api_key),
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'From': 'dmedani@yelp.com'
+    }
+    r = requests.get(PAGER_DUTY_API + 'abilities', headers=headers)
+    if r.status_code != 200:
+        raise InvalidApiKeyException('404 from PagerDuty. Double check your api key')
+
+    return r.json()['abilities']
 
 
 def fetch_incident_chunk(
@@ -76,7 +92,7 @@ def fetch_all_incidents(
     # pagerduty api defaults to exclusive end-date (it uses 00:00 of the date). add a day to compensate
     end_date_plus_one = str((datetime.strptime(end_date, '%Y-%m-%d') + timedelta(days=1)).date())
 
-    for start, end in step_through_weeks(start_date, end_date_plus_one):
+    for start, end in step_through_date_range_chunks(start_date, end_date_plus_one):
         offset = 0
         while True:
             incidents = fetch_incident_chunk(
@@ -120,8 +136,8 @@ def fetch_all_teams(
     pd_api_key: str
 ) -> List[Dict]:
     global teams_chunk_cache
-    if pd_api_key in teams_chunk_cache:
-        return teams_chunk_cache[pd_api_key]
+    # if pd_api_key in teams_chunk_cache:
+    #     return teams_chunk_cache[pd_api_key]
 
     all_teams = []
     offset = 0
@@ -164,8 +180,8 @@ def fetch_all_services(
     pd_api_key: str
 ) -> List[Dict]:
     global services_chunk_cache
-    if pd_api_key in services_chunk_cache:
-        return services_chunk_cache[pd_api_key]
+    # if pd_api_key in services_chunk_cache:
+    #     return services_chunk_cache[pd_api_key]
     all_services = []
     offset = 0
     while True:

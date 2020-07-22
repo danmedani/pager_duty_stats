@@ -65,28 +65,48 @@ class ChartPage extends React.Component {
   }
 
   checkKey() {
+    if (this.state.pdApiKey == '') {
+      this.setState(
+        {
+          apiKeyError: error,
+          checkKeyButtonDisabled: false
+        }
+      )
+      return
+    }
     this.setState(
       {
         checkKeyButtonDisabled: true,
         apiKeyError: null
       }
     )
+    
     fetch(
-      '/api/teams?pd_api_key=' + this.state.pdApiKey
+      '/api/auth?pd_api_key=' + this.state.pdApiKey
       )
       .then(res => res.json())
       .then(
         (result) => {
           this.setState(
             {
-              teams: result,
               gotLegitApiKey: true
             }
           )
-          
-          // looks like the api key worked out. let's go grab the services (this can take a while)
-          // Let's save the api key to local storage...
           localStorage.setItem('pd_api_key', this.state.pdApiKey);
+          
+          fetch(
+            '/api/teams?pd_api_key=' + this.state.pdApiKey
+            )
+            .then(res => res.json())
+            .then(
+              (result) => {    
+                this.setState(
+                  {
+                    teams: result
+                  }
+                )
+              }
+            )
           fetch(
             '/api/services?pd_api_key=' + this.state.pdApiKey
             )
@@ -104,8 +124,7 @@ class ChartPage extends React.Component {
               // Note: it's important to handle errors here
               // instead of a catch() block so that we don't swallow
               // exceptions from actual bugs in components.
-              (error) => {
-                
+              (error) => {   
               }
             )
         },

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, FormControlLabel, Radio, RadioGroup, TextField, ThemeProvider, createMuiTheme } from '@material-ui/core';
+import { Button, FormControlLabel, Radio, RadioGroup, TextField, ThemeProvider, createMuiTheme, CircularProgress } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
 
@@ -20,7 +20,7 @@ class SearchFilter extends React.Component {
     this.state = {
       groupingWindow: 'day',
       chartType: 'SERVICE_NAME',
-      filterType: 'service',
+      filterType: 'team',
       loadingData: false,
       startDate: '2020-05-01',
       endDate: '',
@@ -136,33 +136,51 @@ class SearchFilter extends React.Component {
               </RadioGroup>
               {this.state.filterType == 'service'
                 ?
-                <Autocomplete
-                  multiple
-                  id="services-selector"
-                  options={this.props.services}
-                  getOptionLabel={(service) => service.name}
-                  style={{ width: 300 }}
-                  renderInput={(params) => (
-                    <TextField {...params} label="Select Service(s)" variant="outlined" />
-                  )}
-                  disabled={!this.props.services}
-                  onChange={this.onServicesChange}
-                  value={this.state.services}
-                />
+                this.props.services.length > 0
+                  ?
+                  <Autocomplete
+                    multiple
+                    id="services-selector"
+                    options={this.props.services}
+                    getOptionLabel={(service) => service.name}
+                    style={{ width: 300 }}
+                    renderInput={(params) => (
+                      <TextField {...params} label="Select Service(s)" variant="outlined" />
+                    )}
+                    disabled={!this.props.services}
+                    onChange={this.onServicesChange}
+                    value={this.state.services}
+                  />
+                  :
+                  <div>
+                    <p>
+                      Fetching services...
+                    </p>
+                    <CircularProgress />
+                  </div>
                 :
-                <Autocomplete
-                  multiple
-                  id="team-selector"
-                  options={this.props.teams}
-                  getOptionLabel={(team) => team.name}
-                  style={{ width: 300 }}
-                  renderInput={(params) => (
-                    <TextField {...params} label="Select Team(s)" variant="outlined" />
-                  )}
-                  disabled={!this.props.teams}
-                  onChange={this.onTeamsChange}
-                  value={this.state.teams}
-                />
+                this.props.teams.length > 0
+                  ?
+                  <Autocomplete
+                    multiple
+                    id="team-selector"
+                    options={this.props.teams}
+                    getOptionLabel={(team) => team.name}
+                    style={{ width: 300 }}
+                    renderInput={(params) => (
+                      <TextField {...params} label="Select Team(s)" variant="outlined" />
+                    )}
+                    disabled={!this.props.teams}
+                    onChange={this.onTeamsChange}
+                    value={this.state.teams}
+                  />
+                  :
+                  <div>
+                    <p>
+                      Fetching teams...
+                    </p>
+                    <CircularProgress />
+                  </div>
               }
             </div>
             <TextField

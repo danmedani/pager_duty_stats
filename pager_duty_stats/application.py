@@ -13,6 +13,7 @@ from pager_duty_stats.logic.aggregation import AggregationType
 from pager_duty_stats.logic.aggregation import get_stats
 from pager_duty_stats.logic.aggregation import GroupingWindow
 from pager_duty_stats.logic.incident_types import ExtractionTechnique
+from pager_duty_stats.logic.pager_duty_client import fetch_abilities
 from pager_duty_stats.logic.pager_duty_client import fetch_all_incidents
 from pager_duty_stats.logic.pager_duty_client import fetch_all_services
 from pager_duty_stats.logic.pager_duty_client import fetch_all_teams
@@ -45,6 +46,16 @@ def parse_chart_request(request_json: Dict) -> ChartRequest:
 @application.route('/')
 def index():
     return application.send_static_file('index.html')
+
+
+@application.route('/api/auth')
+def auth():
+    fetch_abilities(pd_api_key=request.args.get('pd_api_key'))
+    return jsonify(
+        {
+            'auth_status': 'OK'
+        }
+    )
 
 
 @application.route('/api/chart', methods=['POST'])

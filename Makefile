@@ -26,14 +26,14 @@ build: clean venv/bin/activate
 .PHONY: test
 test: build lint mypy
 	coverage run --source pager_duty_stats -m pytest tests
-	coverage report -m --fail-under=70
+	coverage report -m --fail-under=60
 
 
 # Run the full python test suite without first building.
 .PHONY: tst
 tst: lint mypy
 	coverage run --source pager_duty_stats -m pytest tests
-	coverage report -m --fail-under=70
+	coverage report -m --fail-under=60
 
 
 # Bundle up the javascript code, production mode
