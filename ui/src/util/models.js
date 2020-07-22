@@ -1,6 +1,7 @@
 var blankChart = {
   series: [],
   options: {
+    colors: ['#ec7063', '#5499c7', '#45b39d', '#f4d03f', '#3440eb', '#af7ac5', '#ebc634', '#34ebcd', '#eb3434', '#eb7a34', '#eb34d3', '#c9eb34', '#34a2eb', '#7aeb34', '#34eb6e', '#a834eb', '#eb3465'],
     chart: {
       type: 'bar',
       stacked: true,
