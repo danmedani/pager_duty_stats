@@ -34,7 +34,7 @@ def fetch_abilities(
         'Authorization': 'Token token={api_key}'.format(api_key=pd_api_key),
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'From': 'dmedani@yelp.com'
+        'From': 'pagerdutydan@gmail.com'
     }
     r = requests.get(PAGER_DUTY_API + 'abilities', headers=headers)
     if r.status_code != 200:
@@ -56,7 +56,7 @@ def fetch_incident_chunk(
         'Authorization': 'Token token={api_key}'.format(api_key=pd_api_key),
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'From': 'dmedani@yelp.com'
+        'From': 'pagerdutydan@gmail.com'
     }
     params = {
         'since': start_date,
@@ -121,7 +121,7 @@ def fetch_teams_chunk(
         'Authorization': 'Token token={api_key}'.format(api_key=pd_api_key),
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'From': 'dmedani@yelp.com'
+        'From': 'pagerdutydan@gmail.com'
     }
     params = {
         'limit': str(limit),
@@ -165,7 +165,7 @@ def fetch_service_chunk(
         'Authorization': 'Token token={api_key}'.format(api_key=pd_api_key),
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'From': 'dmedani@yelp.com'
+        'From': 'pagerdutydan@gmail.com'
     }
     params = {
         'limit': str(limit),

@@ -1,5 +1,6 @@
 'use strict';
 
+import OauthPopup from 'react-oauth-popup';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import StackedColumn from './stackedColumn';
@@ -15,6 +16,14 @@ const chartTitleMap = {
     'CUSTOM_INCIDENT_TYPE': 'by Type',
 }
 
+const onCode = (code, params) => {
+  console.log("wooooo a code", code);
+  console.log("alright! the URLSearchParams interface from the popup url", params);
+}
+const onClose = () => {
+  console.log("closed!");
+}
+
 class ChartPage extends React.Component {
   constructor(props) {
     super(props);
@@ -27,7 +36,8 @@ class ChartPage extends React.Component {
       pdApiKey: '',
       services: [],
       teams: [],
-      searched: false
+      searched: false,
+      oauth_url: ''
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -39,6 +49,25 @@ class ChartPage extends React.Component {
     if (existingApiKey !== '') {
         this.state.pdApiKey = existingApiKey;
     }
+
+    fetch(
+      '/api/oauth/url'
+      )
+      .then(res => res.json())
+      .then(
+        (result) => {
+          this.setState(
+            {
+              oauth_url: result.oauth_url
+            }
+          )
+        },
+        // Note: it's important to handle errors here
+        // instead of a catch() block so that we don't swallow
+        // exceptions from actual bugs in components.
+        (error) => {   
+        }
+      )
   }
 
   getChartTitle(chartType) {
@@ -186,6 +215,15 @@ class ChartPage extends React.Component {
               <Button variant="contained" color="primary" onClick={() => this.checkKey()} disabled={this.state.checkKeyButtonDisabled}>
                 Go
               </Button>
+              </div>
+              <div>
+                <OauthPopup
+                url={this.state.oauth_url}
+                onCode={onCode}
+                onClose={onClose}
+                >
+                    <div>Click me to open a Popup</div>
+                </OauthPopup>
               </div>
             </div>
             :

@@ -1,10 +1,8 @@
-.api_key
+.env
 virtual_env
-*.csv
 __pycache__
 .mypy_cache
 .pytest_cache
-todo
 *.pyc
 .coverage
 node_modules
