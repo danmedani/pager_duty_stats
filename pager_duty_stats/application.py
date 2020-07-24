@@ -6,6 +6,7 @@ from typing import Optional
 
 from flask import Flask
 from flask import jsonify
+from flask import redirect
 from flask import request
 
 from pager_duty_stats.formatter.series import format_series_from_stats
@@ -56,6 +57,14 @@ def auth():
             'auth_status': 'OK'
         }
     )
+
+
+@application.before_request
+def reroute_http_to_https():
+    if not request.is_secure and not application.config['ENV'] == 'development':
+        url = request.url.replace('http://', 'https://', 1)
+        code = 301
+        return redirect(url, code=code)
 
 
 @application.route('/api/chart', methods=['POST'])
@@ -119,5 +128,4 @@ def services():
 
 
 if __name__ == "__main__":
-    application.debug = True
     application.run()

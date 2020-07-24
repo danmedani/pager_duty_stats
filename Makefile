@@ -8,7 +8,7 @@ init: build
 # Run webserver in dev environment
 .PHONY: web
 web:
-	uwsgi --http 127.0.0.1:3031 --wsgi-file pager_duty_stats/application.py --callable application --processes 4 --threads 2 --stats 127.0.0.1:9191
+	FLASK_APP=pager_duty_stats/application.py FLASK_ENV=development flask run
 
 
 # Bundle up the javascript code, dev mode (runs in background)
