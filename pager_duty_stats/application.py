@@ -59,8 +59,8 @@ def parse_chart_request(request_json: Dict) -> ChartRequest:
 
 
 def get_pager_duty_client_id():
-
     return os.environ['PAGERDUTY_OAUTH_CLIENT_ID']
+
 
 @application.route('/')
 def index():
@@ -71,7 +71,7 @@ def get_oauth_rediection_uri():
     return 'http://localhost:5000/api/pager_duty_oauth_landing' if application.config['ENV'] == 'development' else 'https://www.pagerdutystats.com/api/pager_duty_oauth_landing'
 
 
-@application.route('/api/oauth/url')
+@application.route('/api/oauth/token')
 def get_oauth_url():
     global global_code_verifier
     code_verifier, code_challenge = pkce.generate_pkce_pair()
