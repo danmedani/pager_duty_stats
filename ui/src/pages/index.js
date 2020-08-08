@@ -65,11 +65,9 @@ class HomePage extends React.Component {
         localStorage.setItem("pager-duty-token", tokenData.access_token);
         window.location.href = '/stats';
       } else {
-        console.log('not vlid');
         this.setState({ oauth_problem: true });
       }
     } catch(e) {
-      console.log('exception!', e);
       this.setState({ oauth_problem: true });
     }
   }
@@ -87,15 +85,14 @@ class HomePage extends React.Component {
   render() {
     return (
         <div>
-          {this.state.oauth_problem
-            ?
+          {this.state.oauth_problem &&
             <div id="home-button">
               <p>
                 There was some kind of problem with OAuth, sorry.
               </p>
             </div>
-            :
-            this.state.oauth_url && !this.state.oauth_problem
+          }
+          {this.state.oauth_url && !this.state.oauth_problem
               ?
               <div id="home-button">
                 <OauthPopup
