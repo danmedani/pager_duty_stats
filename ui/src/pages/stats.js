@@ -4,10 +4,10 @@ import React from 'react';
 import OauthPopup from 'react-oauth-popup';
 
 import ReactDOM from 'react-dom';
-import StackedColumn from './stackedColumn';
-import SearchFilter from './searchFilter';
+import StackedColumn from '../components/stackedColumn';
+import SearchFilter from '../components/searchFilter';
 import { Button, TextField, CircularProgress } from '@material-ui/core';
-import { blankChart } from './util/models'
+import { blankChart } from '../logic/models'
 
 const e = React.createElement;
 
@@ -46,24 +46,22 @@ class ChartPage extends React.Component {
         this.state.pdApiKey = existingApiKey;
     }
 
-    fetch(
-      '/api/oauth/url'
-      )
-      .then(res => res.json())
-      .then(
-        (result) => {
-          this.setState(
-            {
-              oauth_url: result.oauth_url
-            }
-          )
-        },
-        // Note: it's important to handle errors here
-        // instead of a catch() block so that we don't swallow
-        // exceptions from actual bugs in components.
-        (error) => {   
-        }
-      )
+    // fetch('/api/oauth/url')
+    //   .then(res => res.json())
+    //   .then(
+    //     (result) => {
+    //       this.setState(
+    //         {
+    //           oauth_url: result.oauth_url
+    //         }
+    //       )
+    //     },
+    //     // Note: it's important to handle errors here
+    //     // instead of a catch() block so that we don't swallow
+    //     // exceptions from actual bugs in components.
+    //     (error) => {   
+    //     }
+    //   )
   }
 
   getChartTitle(chartType) {
@@ -202,7 +200,7 @@ class ChartPage extends React.Component {
               </div>
               <div>
                 {this.state.apiKeyError &&
-                  <p className="errorMsg">
+                  <p className="error-msg">
                     API Key Not Accepted
                   </p>
                 }
@@ -238,7 +236,7 @@ class ChartPage extends React.Component {
               <div>
                 {this.state.searchButtonDisabled
                   ?
-                  <div className="graphArea">
+                  <div className="graph-area">
                     <CircularProgress />
                   </div>
                   :
@@ -251,7 +249,7 @@ class ChartPage extends React.Component {
                       searchButtonDisabled={this.state.searchButtonDisabled} 
                     />
                     :
-                    <div className="graphArea">
+                    <div className="graph-area">
                       Patiently awaiting your search...
                     </div>
                 }

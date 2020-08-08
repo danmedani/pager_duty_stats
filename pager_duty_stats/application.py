@@ -35,7 +35,6 @@ if application.config['ENV'] == 'development':
     load_dotenv(path.join(basedir, '.env'))
 
 
-
 class ChartRequest(NamedTuple):
     service_ids: Optional[List[str]]
     team_ids: Optional[List[str]]
@@ -67,51 +66,41 @@ def index():
     return application.send_static_file('index.html')
 
 
-def get_oauth_rediection_uri():
-    return 'http://localhost:5000/api/pager_duty_oauth_landing' if application.config['ENV'] == 'development' else 'https://www.pagerdutystats.com/api/pager_duty_oauth_landing'
+@application.route('/stats')
+def stats():
+    return application.send_static_file('stats.html')
 
 
-@application.route('/api/oauth/token')
-def get_oauth_url():
-    global global_code_verifier
-    code_verifier, code_challenge = pkce.generate_pkce_pair()
-    global_code_verifier = code_verifier
-    return jsonify(
-        {
-            'oauth_url': 'https://app.pagerduty.com/oauth/authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code&code_challenge_method=S256&code_challenge={code_challenge}'.format(
-                client_id=get_pager_duty_client_id(),
-                redirect_uri=urllib.parse.quote(get_oauth_rediection_uri()),
-                code_challenge=code_challenge
-            )
-        }
-    )
+# @application.route('/oauth_landing')
+# def oauth_landing():
+#     return application.send_static_file('oauth_landing.html')
 
 
-@application.route('/api/pager_duty_oauth_landing')
-def pager_duty_oauth_landing():
-    global global_code_verifier, global_access_token
-    if 'error' in request.args:
-        print('error!', request.args.get('error_description'))
-    else:
-        code = request.args.get('code')
-        subdomain = request.args.get('subdomain')
+# @application.route('/api/pager_duty_oauth_landing')
+# def pager_duty_oauth_landing():
+#     if 'error' in request.args:
+#         print('error!', request.args.get('error_description'))
+#         return application.send_static_file('index.html')
+#     else:
+#         code = request.args.get('code')
+#         # subdomain = request.args.get('subdomain')
 
-        headers = {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        }
-        params = {
-            'grant_type': 'authorization_code',
-            'client_id': get_pager_duty_client_id(),
-            'redirect_uri': get_oauth_rediection_uri(),
-            'code': code,
-            'code_verifier': global_code_verifier
-        }
-        r = requests.post('https://app.pagerduty.com/oauth/token', headers=headers, params=params)
-        print(r.json())
-        global_access_token = r.json()['access_token']
+#         headers = {
+#             'Content-Type': 'application/json',
+#             'Accept': 'application/json'
+#         }
+#         params = {
+#             'grant_type': 'authorization_code',
+#             'client_id': get_pager_duty_client_id(),
+#             'redirect_uri': get_oauth_rediection_uri(),
+#             'code': code,
+#             'code_verifier': global_code_verifier
+#         }
+#         r = requests.post('https://app.pagerduty.com/oauth/token', headers=headers, params=params)
 
-    return application.send_static_file('index.html')
+#         global_access_token = r.json()['access_token']
+
+#     return application.send_static_file('index.html')
 
 
 @application.route('/api/auth')

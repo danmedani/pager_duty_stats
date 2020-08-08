@@ -126,8 +126,8 @@ class SearchFilter extends React.Component {
 
   render() {
     return (
-      <div id="searchFilterContainer">
-        <div id="searchFilter">
+      <div id="search-filter-container">
+        <div id="search-filter">
           <ThemeProvider theme={theme}>
             <div >
               <RadioGroup aria-label="Filter Type" name="filterType" value={this.state.filterType} onChange={this.handleFilterTypeChange}>
@@ -218,7 +218,7 @@ class SearchFilter extends React.Component {
             </Button>
           </ThemeProvider>
         </div>
-        <div className="errorMsg">
+        <div className="error-msg">
           {this.state.searchError && 
             <p>
               {this.state.searchError}

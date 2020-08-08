@@ -1,9 +1,12 @@
 const path = require('path');
 
 module.exports = {
-  entry: './ui/src/index.js',
+  entry: {
+      index: './ui/src/pages/index.js',
+      stats: './ui/src/pages/stats.js'
+  },
   output: {
-    filename: 'main.js',
+    filename: '[name].bundle.js',
     path: path.resolve(__dirname, 'dist'),
   },
   watch: true,

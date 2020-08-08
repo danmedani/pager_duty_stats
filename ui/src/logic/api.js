@@ -1,7 +1,4 @@
-function handleErrors(response) {
-  if (!response.ok) throw Error(response.statusText);
-  return response;
-}
+import { handleErrors } from './errors';
 
 async function isPagerDutyApiTokenValid(pagerDutyApiToken) {
   fetch('/api/auth?pd_api_key=' + pagerDutyApiToken)
@@ -18,3 +15,5 @@ async function isPagerDutyApiTokenValid(pagerDutyApiToken) {
       }
     )
 }
+
+export { isPagerDutyApiTokenValid };
