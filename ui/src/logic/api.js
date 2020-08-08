@@ -1,19 +1,16 @@
-import { handleErrors } from './errors';
-
-async function isPagerDutyApiTokenValid(pagerDutyApiToken) {
-  fetch('/api/auth?pd_api_key=' + pagerDutyApiToken)
-    .then(handleErrors)
-    .then(result => result.json())
-    .then(
-      (result) => {
-        if (result.status === 'valid') {
-          return true;
-        }
-      },
-      (error) => {
-        return false;
+async function isOauthTokenValid(bearerToken) {
+  console.log('hi');
+  try {
+    await fetch('/api/auth', {
+      headers: {
+        'Authorization': 'Bearer ' + bearerToken,
+        'Accept': 'application/vnd.pagerduty+json;version=2'
       }
-    )
+    })
+  } catch(e) {
+    return false;
+  }
+  return true;
 }
 
-export { isPagerDutyApiTokenValid };
+export { isOauthTokenValid };

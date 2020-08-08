@@ -6,4 +6,4 @@ __pycache__
 *.pyc
 .coverage
 node_modules
-ui/dist/main.js
+ui/dist/*.bundle.js
