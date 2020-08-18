@@ -46,7 +46,7 @@ class ChartPage extends React.Component {
   }
 
   getChartTitle(chartType) {
-    return 'Incident Counts, ' + chartTitleMap[chartType];
+    return 'Incident Counts';
   }
 
   updateChartData(chartDataFromSearch, chartType) {
