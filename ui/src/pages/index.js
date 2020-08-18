@@ -16,29 +16,6 @@ const REDIRECT_URL = window.location.href
 const e = React.createElement;
 
 
-// const onCode = (code, params) => {
-//   var token_url = 'https://app.pagerduty.com/oauth/token?grant_type=authorization_code&client_id='+
-//     CLIENT_ID+'&redirect_uri='+REDIRECT_URL+'&code='+code+'&code_verifier='+sessionStorage.getItem('code_verifier');
-//   fetch(
-//     token_url,
-//     {
-//       method: 'POST'
-//     }
-//   ).then(res => res.json())
-//   .then(
-//     (result) => {
-//       var valid = await isOauthTokenValid(result.access_token);
-//       if (valid) {
-//         localStorage.setItem("pager-duty-token", result.access_token);
-//         window.location.href = '/stats';
-//       }
-//     },
-//     (error) => {
-//       console.log('error!!! ' + error);
-//     }
-//   )
-
-// }
 const onClose = () => {
   console.log("closed!");
 }
@@ -59,8 +36,8 @@ class HomePage extends React.Component {
     CLIENT_ID+'&redirect_uri='+REDIRECT_URL+'&code='+code+'&code_verifier='+sessionStorage.getItem('code_verifier');
 
     try {
-      var tokenData = await fetch(token_url, {method: 'POST'});
-      var valid = await isOauthTokenValid(tokenData.access_token);
+      const tokenData = await (await fetch(token_url, {method: 'POST'})).json();
+      const valid = await isOauthTokenValid(tokenData.access_token);
       if (valid) {
         localStorage.setItem("pager-duty-token", tokenData.access_token);
         window.location.href = '/stats';

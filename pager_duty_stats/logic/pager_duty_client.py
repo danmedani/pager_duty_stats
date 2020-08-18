@@ -26,17 +26,18 @@ class InvalidServiceException(Exception):
 class InvalidApiKeyException(Exception):
     pass
 
+def get_headers(bearer_token: str):
+    return {
+        'Authorization': 'Bearer ' + bearer_token,
+        'Accept': 'application/vnd.pagerduty+json;version=2',
+        'Content-Type': 'application/json',
+    }
+
 
 def fetch_abilities(
-    pd_api_key: str,
+    bearer_token: str,
 ) -> List[str]:
-    headers = {
-        'Authorization': 'Token token={api_key}'.format(api_key=pd_api_key),
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'From': 'pagerdutydan@gmail.com'
-    }
-    r = requests.get(PAGER_DUTY_API + 'abilities', headers=headers)
+    r = requests.get(PAGER_DUTY_API + 'abilities', headers=get_headers(bearer_token))
     if r.status_code != 200:
         raise InvalidApiKeyException('404 from PagerDuty. Double check your api key')
 
@@ -44,7 +45,7 @@ def fetch_abilities(
 
 
 def fetch_incident_chunk(
-    pd_api_key: str,
+    bearer_token: str,
     service_ids: List[str],
     team_ids: List[str],
     start_date: str,
@@ -52,12 +53,6 @@ def fetch_incident_chunk(
     limit: int,
     offset: int
 ) -> List[Dict]:
-    headers = {
-        'Authorization': 'Token token={api_key}'.format(api_key=pd_api_key),
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'From': 'pagerdutydan@gmail.com'
-    }
     params = {
         'since': start_date,
         'until': end_date,
@@ -70,7 +65,7 @@ def fetch_incident_chunk(
     if team_ids:
         params['team_ids[]'] = team_ids  # type: ignore
 
-    r = requests.get(PAGER_DUTY_API + 'incidents', headers=headers, params=params)
+    r = requests.get(PAGER_DUTY_API + 'incidents', headers=get_headers(bearer_token), params=params)
 
     if r.status_code == 400:
         raise InvalidServiceException('400 from PagerDuty. Make sure you have legit service_ids specified')
@@ -81,7 +76,7 @@ def fetch_incident_chunk(
 
 
 def fetch_all_incidents(
-    pd_api_key: str,
+    bearer_token: str,
     service_ids: List[str],
     team_ids: List[str],
     start_date: str,
@@ -96,7 +91,7 @@ def fetch_all_incidents(
         offset = 0
         while True:
             incidents = fetch_incident_chunk(
-                pd_api_key=pd_api_key,
+                bearer_token=bearer_token,
                 service_ids=service_ids,
                 team_ids=team_ids,
                 start_date=start,
@@ -113,27 +108,21 @@ def fetch_all_incidents(
 
 
 def fetch_teams_chunk(
-    pd_api_key: str,
+    bearer_token: str,
     limit: int,
     offset: int
 ) -> List[Dict]:
-    headers = {
-        'Authorization': 'Token token={api_key}'.format(api_key=pd_api_key),
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'From': 'pagerdutydan@gmail.com'
-    }
     params = {
         'limit': str(limit),
         'offset': str(offset)
     }
-    r = requests.get(PAGER_DUTY_API + 'teams', headers=headers, params=params)
+    r = requests.get(PAGER_DUTY_API + 'teams', headers=get_headers(bearer_token), params=params)
 
     return r.json()['teams']
 
 
 def fetch_all_teams(
-    pd_api_key: str
+    bearer_token: str,
 ) -> List[Dict]:
     global teams_chunk_cache
     # if pd_api_key in teams_chunk_cache:
@@ -143,7 +132,7 @@ def fetch_all_teams(
     offset = 0
     while True:
         teams_chunk = fetch_teams_chunk(
-            pd_api_key=pd_api_key,
+            bearer_token=bearer_token,
             limit=TEAM_FETCH_LIMIT,
             offset=offset
         )
@@ -152,32 +141,26 @@ def fetch_all_teams(
         all_teams += teams_chunk
         offset += TEAM_FETCH_LIMIT
 
-    teams_chunk_cache[pd_api_key] = all_teams
+    teams_chunk_cache[bearer_token] = all_teams
     return all_teams
 
 
 def fetch_service_chunk(
-    pd_api_key: str,
+    bearer_token: str,
     limit: int,
     offset: int
 ) -> List[Dict]:
-    headers = {
-        'Authorization': 'Token token={api_key}'.format(api_key=pd_api_key),
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'From': 'pagerdutydan@gmail.com'
-    }
     params = {
         'limit': str(limit),
         'offset': str(offset)
     }
-    r = requests.get(PAGER_DUTY_API + 'services', headers=headers, params=params)
+    r = requests.get(PAGER_DUTY_API + 'services', headers=get_headers(bearer_token), params=params)
 
     return r.json()['services']
 
 
 def fetch_all_services(
-    pd_api_key: str
+    bearer_token: str,
 ) -> List[Dict]:
     global services_chunk_cache
     # if pd_api_key in services_chunk_cache:
@@ -186,7 +169,7 @@ def fetch_all_services(
     offset = 0
     while True:
         services_chunk = fetch_service_chunk(
-            pd_api_key=pd_api_key,
+            bearer_token=bearer_token,
             limit=TEAM_FETCH_LIMIT,
             offset=offset
         )
@@ -195,5 +178,5 @@ def fetch_all_services(
         all_services += services_chunk
         offset += TEAM_FETCH_LIMIT
 
-    services_chunk_cache[pd_api_key] = all_services
+    services_chunk_cache[bearer_token] = all_services
     return all_services

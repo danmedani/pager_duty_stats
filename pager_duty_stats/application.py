@@ -3,12 +3,10 @@ from typing import Dict
 from typing import List
 from typing import NamedTuple
 from typing import Optional
-import urllib
 from flask import Flask
 from flask import jsonify
 from flask import redirect
 from flask import request
-import pkce
 import os
 from pager_duty_stats.formatter.series import format_series_from_stats
 from pager_duty_stats.logic.aggregation import AggregationType
@@ -19,20 +17,16 @@ from pager_duty_stats.logic.pager_duty_client import fetch_abilities
 from pager_duty_stats.logic.pager_duty_client import fetch_all_incidents
 from pager_duty_stats.logic.pager_duty_client import fetch_all_services
 from pager_duty_stats.logic.pager_duty_client import fetch_all_teams
-import requests
 
-from os import environ, path
 from dotenv import load_dotenv
 
 application = Flask(__name__, static_folder='../ui/dist/', static_url_path='')
 global_code_verifier = ''
 global_access_token = ''
 
-
-
 if application.config['ENV'] == 'development':
-    basedir = path.abspath(path.dirname(__file__))
-    load_dotenv(path.join(basedir, '.env'))
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    load_dotenv(os.path.join(basedir, '.env'))
 
 
 class ChartRequest(NamedTuple):
@@ -42,18 +36,17 @@ class ChartRequest(NamedTuple):
     end_date: Optional[str]
     grouping_window: str
     chart_type: str
-    pd_api_key: str
 
 
 def parse_chart_request(request_json: Dict) -> ChartRequest:
+    print('request_json', request_json)
     return ChartRequest(
         service_ids=request_json['service_ids'].split(',') if 'service_ids' in request_json else None,
         team_ids=request_json['team_ids'].split(',') if 'team_ids' in request_json else None,
         start_date=request_json['start_date'],
         end_date=request_json['end_date'] or str(datetime.now().date()),
         grouping_window=request_json['grouping_window'],
-        chart_type=request_json['chart_type'],
-        pd_api_key=request_json['pd_api_key']
+        chart_type=request_json['chart_type']
     )
 
 
@@ -71,45 +64,40 @@ def stats():
     return application.send_static_file('stats.html')
 
 
-# @application.route('/oauth_landing')
-# def oauth_landing():
-#     return application.send_static_file('oauth_landing.html')
-
-
-# @application.route('/api/pager_duty_oauth_landing')
-# def pager_duty_oauth_landing():
-#     if 'error' in request.args:
-#         print('error!', request.args.get('error_description'))
-#         return application.send_static_file('index.html')
-#     else:
-#         code = request.args.get('code')
-#         # subdomain = request.args.get('subdomain')
-
-#         headers = {
-#             'Content-Type': 'application/json',
-#             'Accept': 'application/json'
-#         }
-#         params = {
-#             'grant_type': 'authorization_code',
-#             'client_id': get_pager_duty_client_id(),
-#             'redirect_uri': get_oauth_rediection_uri(),
-#             'code': code,
-#             'code_verifier': global_code_verifier
-#         }
-#         r = requests.post('https://app.pagerduty.com/oauth/token', headers=headers, params=params)
-
-#         global_access_token = r.json()['access_token']
-
-#     return application.send_static_file('index.html')
-
-
 @application.route('/api/auth')
 def auth():
-    fetch_abilities(pd_api_key=request.args.get('pd_api_key'))
+    fetch_abilities(bearer_token=request.headers.get('Authorization'))
+
     return jsonify(
         {
             'auth_status': 'OK'
         }
+    )
+
+
+@application.route('/api/teams', methods=['GET'])
+def teams():
+    return jsonify(
+        [
+            {
+                'id': team['id'],
+                'name': team['name'],
+            }
+            for team in fetch_all_teams(bearer_token=request.headers.get('Authorization'))
+        ]
+    )
+
+
+@application.route('/api/services', methods=['GET'])
+def services():
+    return jsonify(
+        [
+            {
+                'id': team['id'],
+                'name': team['name'],
+            }
+            for team in fetch_all_services(bearer_token=request.headers.get('Authorization'))
+        ]
     )
 
 
@@ -125,7 +113,7 @@ def reroute_http_to_https():
 def chart():
     chart_request = parse_chart_request(request.json)
     incidents = fetch_all_incidents(
-        pd_api_key=chart_request.pd_api_key,  # todo: make this betterer
+        bearer_token=request.headers.get('Authorization'),
         service_ids=chart_request.service_ids,
         team_ids=chart_request.team_ids,
         start_date=chart_request.start_date,
@@ -152,32 +140,6 @@ def chart():
             stats_map=stats,
             aggregation_type=AggregationType[chart_request.chart_type]
         )
-    )
-
-
-@application.route('/api/teams', methods=['GET'])
-def teams():
-    return jsonify(
-        [
-            {
-                'id': team['id'],
-                'name': team['name'],
-            }
-            for team in fetch_all_teams(pd_api_key=request.args.get('pd_api_key'))
-        ]
-    )
-
-
-@application.route('/api/services', methods=['GET'])
-def services():
-    return jsonify(
-        [
-            {
-                'id': team['id'],
-                'name': team['name'],
-            }
-            for team in fetch_all_services(pd_api_key=request.args.get('pd_api_key'))
-        ]
     )
 
 

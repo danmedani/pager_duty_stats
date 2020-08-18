@@ -1,4 +1,5 @@
 import React from 'react';
+import { getChart } from '../logic/api';
 import { Button, FormControlLabel, Radio, RadioGroup, TextField, ThemeProvider, createMuiTheme, CircularProgress } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
@@ -75,8 +76,7 @@ class SearchFilter extends React.Component {
       'start_date': this.state.startDate,
       'end_date': this.state.endDate,
       'grouping_window': this.state.groupingWindow,
-      'chart_type': this.state.chartType,
-      'pd_api_key': this.props.pdApiKey,
+      'chart_type': this.state.chartType
     };
     if (this.state.filterType == 'service') {
         data.service_ids = this.state.services.map(service => service.id).join(',');
@@ -91,37 +91,17 @@ class SearchFilter extends React.Component {
         return
     }
     this.props.beginSearchCallback();
-    fetch(
-      '/api/chart',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(data)
-        }
-      )
-      .then(res => res.json())
-      .then(
-        (result) => {
-          this.setState({
-            loadingData: false,
-            items: result.items
-          });
-          this.props.updateChartDataCallback(result, this.state.chartType);
-          this.props.endSearchCallback();
-        },
-        // Note: it's important to handle errors here
-        // instead of a catch() block so that we don't swallow
-        // exceptions from actual bugs in components.
-        (error) => {
-          this.setState({
-            loadingData: false,
-            searchError: error
-          });
-          this.props.endSearchCallback();
-        }
-      )
+    
+    getChart(data, localStorage.getItem("pager-duty-token")).then(
+      (result) => {
+        this.setState({
+          loadingData: false,
+          items: result.items
+        });
+        this.props.updateChartDataCallback(result, this.state.chartType);
+        this.props.endSearchCallback();
+      }
+    );
   }
 
   render() {

@@ -1,67 +1,48 @@
 'use strict';
 
+require("regenerator-runtime/runtime");
+
 import React from 'react';
-import OauthPopup from 'react-oauth-popup';
+import { isOauthTokenValid, getServices, getTeams } from '../logic/api';
 
 import ReactDOM from 'react-dom';
 import StackedColumn from '../components/stackedColumn';
 import SearchFilter from '../components/searchFilter';
-import { Button, TextField, CircularProgress } from '@material-ui/core';
+import { CircularProgress, Button } from '@material-ui/core';
 import { blankChart } from '../logic/models'
 
 const e = React.createElement;
-
-
-const onCode = (code, params) => {
-  console.log("wooooo a code", code);
-  console.log("alright! the URLSearchParams interface from the popup url", params);
-}
-const onClose = () => {
-  console.log("closed!");
-}
 
 class ChartPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = { 
-      apiKeyError: '',
       chartData: blankChart,
       searchButtonDisabled: false,
-      checkKeyButtonDisabled: false,
-      gotLegitApiKey: false,
-      pdApiKey: '',
       services: [],
       teams: [],
-      searched: false,
-      oauth_url: ''
+      searched: false
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.beginSearch = this.beginSearch.bind(this);
     this.endSearch = this.endSearch.bind(this);
     this.updateChartData = this.updateChartData.bind(this);
+    this.logOut = this.logOut.bind(this);
+  }
 
-    var existingApiKey = localStorage.getItem('pd_api_key') || '';
-    if (existingApiKey !== '') {
-        this.state.pdApiKey = existingApiKey;
+  async componentDidMount() {
+    const existingToken = localStorage.getItem("pager-duty-token");
+    if ((!existingToken) || ! await isOauthTokenValid(existingToken)) {
+      window.location.href = '/';
+    } else {
+      getTeams(existingToken).then(
+        (result) => {this.setState({teams: result})}
+      );
+      getServices(existingToken).then(
+        (result) => {this.setState({services: result})}
+      );
     }
-
-    // fetch('/api/oauth/url')
-    //   .then(res => res.json())
-    //   .then(
-    //     (result) => {
-    //       this.setState(
-    //         {
-    //           oauth_url: result.oauth_url
-    //         }
-    //       )
-    //     },
-    //     // Note: it's important to handle errors here
-    //     // instead of a catch() block so that we don't swallow
-    //     // exceptions from actual bugs in components.
-    //     (error) => {   
-    //     }
-    //   )
   }
 
   getChartTitle(chartType) {
@@ -77,6 +58,11 @@ class ChartPage extends React.Component {
       chartData: chartData,
       searched: true
     });
+  }
+
+  logOut() {
+    localStorage.removeItem('pager-duty-token');
+    window.location.href = '/';
   }
 
   beginSearch() {
@@ -97,73 +83,6 @@ class ChartPage extends React.Component {
       )
       return
     }
-    this.setState(
-      {
-        checkKeyButtonDisabled: true,
-        apiKeyError: null
-      }
-    )
-    
-    fetch(
-      '/api/auth?pd_api_key=' + this.state.pdApiKey
-      )
-      .then(res => res.json())
-      .then(
-        (result) => {
-          this.setState(
-            {
-              gotLegitApiKey: true
-            }
-          )
-          localStorage.setItem('pd_api_key', this.state.pdApiKey);
-          
-          fetch(
-            '/api/teams?pd_api_key=' + this.state.pdApiKey
-            )
-            .then(res => res.json())
-            .then(
-              (result) => {    
-                this.setState(
-                  {
-                    teams: result
-                  }
-                )
-              }
-            )
-          fetch(
-            '/api/services?pd_api_key=' + this.state.pdApiKey
-            )
-            .then(res => res.json())
-            .then(
-              (result) => {
-                this.setState(
-                  {
-                    services: result,
-                    checkKeyButtonDisabled: false,
-                    apiKeyError: null
-                  }
-                )
-              },
-              // Note: it's important to handle errors here
-              // instead of a catch() block so that we don't swallow
-              // exceptions from actual bugs in components.
-              (error) => {   
-              }
-            )
-        },
-        // Note: it's important to handle errors here
-        // instead of a catch() block so that we don't swallow
-        // exceptions from actual bugs in components.
-        (error) => {
-          this.setState(
-            {
-              pdApiKey: '',
-              apiKeyError: error,
-              checkKeyButtonDisabled: false
-            }
-          )
-        }
-      )
   }
 
   handleInputChange(event) {
@@ -179,83 +98,43 @@ class ChartPage extends React.Component {
   render() {
     return (
         <div>
-          {!this.state.gotLegitApiKey 
-            ?
-            <div id="pdApiKey">
-              <div>
-                <p className="title">
-                  Enter PagerDuty API Key
-                </p>
+          <div>
+            <SearchFilter 
+              updateChartDataCallback={this.updateChartData}
+              beginSearchCallback={this.beginSearch}
+              endSearchCallback={this.endSearch} 
+              searchButtonDisabled={this.state.searchButtonDisabled} 
+              pdApiKey={this.state.pdApiKey}
+              teams={this.state.teams}
+              services={this.state.services}
+            />
+          </div>
+          <div>
+          <Button variant="contained" color="secondary" onClick={() => this.logOut()}>
+            Log Out
+          </Button>
+          </div>
+          <div>
+            {this.state.searchButtonDisabled
+              ?
+              <div className="graph-area">
+                <CircularProgress />
               </div>
-              <div>
-                <TextField 
-                  id="outlined-basic" 
-                  label="Pager Duty Api Key" 
-                  variant="outlined" 
-                  name="pdApiKey"
-                  type="password"
-                  value={this.state.pdApiKey} 
-                  onChange={this.handleInputChange} 
-                />
-              </div>
-              <div>
-                {this.state.apiKeyError &&
-                  <p className="error-msg">
-                    API Key Not Accepted
-                  </p>
-                }
-                </div>
-              <div>
-              <Button variant="contained" color="primary" onClick={() => this.checkKey()} disabled={this.state.checkKeyButtonDisabled}>
-                Go
-              </Button>
-              </div>
-              <div>
-                <OauthPopup
-                  url={this.state.oauth_url}
-                  onCode={onCode}
-                  onClose={onClose}
-                >
-                  <div>Click me to open a Popup</div>
-                </OauthPopup>
-              </div>
-            </div>
-            :
-            <div>
-              <div>
-                <SearchFilter 
-                  updateChartDataCallback={this.updateChartData}
+              :
+              this.state.searched
+                ?
+                <StackedColumn 
+                  chartData={this.state.chartData}
                   beginSearchCallback={this.beginSearch}
-                  endSearchCallback={this.endSearch} 
+                  endSearchCallback={this.endSearch}
                   searchButtonDisabled={this.state.searchButtonDisabled} 
-                  pdApiKey={this.state.pdApiKey}
-                  teams={this.state.teams}
-                  services={this.state.services}
                 />
-              </div>
-              <div>
-                {this.state.searchButtonDisabled
-                  ?
-                  <div className="graph-area">
-                    <CircularProgress />
-                  </div>
-                  :
-                  this.state.searched
-                    ?
-                    <StackedColumn 
-                      chartData={this.state.chartData}
-                      beginSearchCallback={this.beginSearch}
-                      endSearchCallback={this.endSearch}
-                      searchButtonDisabled={this.state.searchButtonDisabled} 
-                    />
-                    :
-                    <div className="graph-area">
-                      Patiently awaiting your search...
-                    </div>
-                }
-              </div>
-            </div>
-          }
+                :
+                <div className="graph-area">
+                  Patiently awaiting your search...
+                </div>
+            }
+          </div>
         </div>
     );
   }
