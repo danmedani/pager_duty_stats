@@ -78,6 +78,7 @@ lint:
 
 
 # Package up the code up and deploy to aws
+# You need to be Dan to do this
 .PHONY: deploy
 deploy: build webpack
 	eb deploy PagerDutyStats-env

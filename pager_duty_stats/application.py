@@ -39,7 +39,6 @@ class ChartRequest(NamedTuple):
 
 
 def parse_chart_request(request_json: Dict) -> ChartRequest:
-    print('request_json', request_json)
     return ChartRequest(
         service_ids=request_json['service_ids'].split(',') if 'service_ids' in request_json else None,
         team_ids=request_json['team_ids'].split(',') if 'team_ids' in request_json else None,
