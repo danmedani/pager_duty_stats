@@ -1,13 +1,16 @@
+import os
 from datetime import datetime
 from typing import Dict
 from typing import List
 from typing import NamedTuple
 from typing import Optional
+
+from dotenv import load_dotenv
 from flask import Flask
 from flask import jsonify
 from flask import redirect
 from flask import request
-import os
+
 from pager_duty_stats.formatter.series import format_series_from_stats
 from pager_duty_stats.logic.aggregation import AggregationType
 from pager_duty_stats.logic.aggregation import get_stats
@@ -17,8 +20,6 @@ from pager_duty_stats.logic.pager_duty_client import fetch_abilities
 from pager_duty_stats.logic.pager_duty_client import fetch_all_incidents
 from pager_duty_stats.logic.pager_duty_client import fetch_all_services
 from pager_duty_stats.logic.pager_duty_client import fetch_all_teams
-
-from dotenv import load_dotenv
 
 application = Flask(__name__, static_folder='../ui/dist/', static_url_path='')
 global_code_verifier = ''

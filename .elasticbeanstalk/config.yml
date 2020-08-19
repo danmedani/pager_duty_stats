@@ -1,4 +1,6 @@
 branch-defaults:
+  oauth_refactor:
+    environment: PagerDutyStats-env
   web_app:
     environment: PagerDutyStats-env
 environment-defaults:
@@ -14,6 +16,6 @@ global:
   instance_profile: null
   platform_name: null
   platform_version: null
-  profile: null
+  profile: eb-cli
   sc: git
   workspace_type: Application

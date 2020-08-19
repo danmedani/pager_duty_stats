@@ -236,6 +236,10 @@ def convert_day_stats_to_week_stats(
                 for name, count in stats[date]['aggregations'][aggregation_type].items():
                     running_week_stats['aggregations'][aggregation_type][name] += count
 
+    if running_week_stats['total_pages'] > 0:
+        # We don't have a full week... include it anyways
+        week_stats[start_of_week] = running_week_stats
+
     return week_stats
 
 

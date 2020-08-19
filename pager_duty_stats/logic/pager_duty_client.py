@@ -26,6 +26,7 @@ class InvalidServiceException(Exception):
 class InvalidApiKeyException(Exception):
     pass
 
+
 def get_headers(bearer_token: str):
     return {
         'Authorization': 'Bearer ' + bearer_token,

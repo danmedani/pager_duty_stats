@@ -31,7 +31,7 @@ test: build lint mypy
 
 # Run the full python test suite without first building.
 .PHONY: tst
-tst: lint mypy
+tst:
 	coverage run --source pager_duty_stats -m pytest tests
 	coverage report -m --fail-under=60
 
