@@ -7,11 +7,6 @@ Aggregates PagerDuty incident statistics to help you figure out what's happening
 
 https://www.pagerdutystats.com
 
-# Auth
-Oauth is coming soon - for now you'll need to enter your PagerDuty API Token into the site. The website is totally stateless at this point, so we aren't saving any tokens on the backend.
-
-To generate an api token from PagerDuty, go to My Profile -> User Settings -> Create API User Token
-
 # Setting Up Dev Environment
 Steps to setting up dev environment (you should already have `git`, `npm`, and `python3`)
 1) `git clone https://github.com/danmedani/pager_duty_stats.git`
