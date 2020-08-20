@@ -26,14 +26,14 @@ build: clean venv/bin/activate
 .PHONY: test
 test: build lint mypy
 	coverage run --source pager_duty_stats -m pytest tests
-	coverage report -m --fail-under=60
+	coverage report -m --fail-under=80
 
 
 # Run the full python test suite without first building.
 .PHONY: tst
-tst: lint mypy
+tst:
 	coverage run --source pager_duty_stats -m pytest tests
-	coverage report -m --fail-under=60
+	coverage report -m --fail-under=80
 
 
 # Bundle up the javascript code, production mode
@@ -78,6 +78,7 @@ lint:
 
 
 # Package up the code up and deploy to aws
+# You need to be Dan to do this
 .PHONY: deploy
 deploy: build webpack
 	eb deploy PagerDutyStats-env

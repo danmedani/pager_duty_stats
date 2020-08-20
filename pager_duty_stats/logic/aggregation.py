@@ -21,10 +21,6 @@ class GroupingWindow(Enum):
     DAY = 'day'
     WEEK = 'week'
 
-    # useful for making args human readable
-    def __str__(self):
-        return self.value
-
 
 class AggregationType(Enum):
     SERVICE_NAME = 'service_name'
@@ -235,6 +231,10 @@ def convert_day_stats_to_week_stats(
             for aggregation_type in aggregation_types:
                 for name, count in stats[date]['aggregations'][aggregation_type].items():
                     running_week_stats['aggregations'][aggregation_type][name] += count
+
+    if running_week_stats['total_pages'] > 0 and start_of_week:
+        # We don't have a full week... include it anyways
+        week_stats[start_of_week] = running_week_stats
 
     return week_stats
 

@@ -19,7 +19,7 @@ def test_fetch_incident_chunk_200(
     )
 
     assert fetch_incident_chunk(
-        pd_api_key='fake_api_key',
+        bearer_token='mock_token',
         service_ids=['serviceA', 'serviceB'],
         team_ids=[],
         start_date='2020-01-01',
@@ -30,10 +30,9 @@ def test_fetch_incident_chunk_200(
     mock_requests.get.assert_called_once_with(
         'https://api.pagerduty.com/incidents',
         headers={
-            'Authorization': 'Token token=fake_api_key',
+            'Authorization': 'Bearer mock_token',
+            'Accept': 'application/vnd.pagerduty+json;version=2',
             'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'From': 'dmedani@yelp.com'
         },
         params={
             'service_ids[]': ['serviceA', 'serviceB'],
@@ -57,7 +56,7 @@ def test_fetch_incident_chunk_invalid_service(
 
     with pytest.raises(InvalidServiceException):
         fetch_incident_chunk(
-            pd_api_key='fake_api_key',
+            bearer_token='mock_token',
             service_ids=['serviceA', 'serviceB'],
             team_ids=[],
             start_date='2020-01-01',
@@ -79,7 +78,7 @@ def test_fetch_incident_chunk_invalid_api_key(
 
     with pytest.raises(InvalidApiKeyException):
         fetch_incident_chunk(
-            pd_api_key='fake_api_key',
+            bearer_token='mock_token',
             service_ids=['serviceA', 'serviceB'],
             team_ids=[],
             start_date='2020-01-01',
@@ -106,7 +105,7 @@ def test_fetch_all_incidents(
         []
     ]
     assert fetch_all_incidents(
-        pd_api_key='fake_api_key',
+        bearer_token='mock_token',
         service_ids=['serviceA', 'serviceB'],
         team_ids=[],
         start_date='2020-01-01',
@@ -120,7 +119,7 @@ def test_fetch_all_incidents(
     ]
     mock_fetch_incident_chunk.assert_has_calls([
         mock.call(
-            pd_api_key='fake_api_key',
+            bearer_token='mock_token',
             service_ids=['serviceA', 'serviceB'],
             team_ids=[],
             start_date='2020-01-01',
@@ -129,7 +128,7 @@ def test_fetch_all_incidents(
             offset=0
         ),
         mock.call(
-            pd_api_key='fake_api_key',
+            bearer_token='mock_token',
             service_ids=['serviceA', 'serviceB'],
             team_ids=[],
             start_date='2020-01-01',
@@ -138,7 +137,7 @@ def test_fetch_all_incidents(
             offset=100
         ),
         mock.call(
-            pd_api_key='fake_api_key',
+            bearer_token='mock_token',
             service_ids=['serviceA', 'serviceB'],
             team_ids=[],
             start_date='2020-01-01',
