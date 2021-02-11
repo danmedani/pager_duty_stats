@@ -23,7 +23,7 @@
   "dependencies": {
     "@material-ui/core": "^4.11.0",
     "@material-ui/lab": "^4.0.0-alpha.56",
-    "apexcharts": "^3.19.3",
+    "apexcharts": "^3.24.0",
     "js-datepicker": "^5.15.0",
     "lodash": "^4.17.19",
     "react": "^16.13.1",
