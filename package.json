@@ -31,9 +31,7 @@
     "react-dom": "^16.13.1",
     "react-oauth-popup": "^0.1.1",
     "react-swipeable-views": "^0.13.9",
-    "uglifyjs-webpack-plugin": "^2.2.0"
-  },
-  "devDependencies": {
+    "uglifyjs-webpack-plugin": "^2.2.0",
     "@babel/cli": "^7.10.5",
     "@babel/core": "^7.10.5",
     "@babel/preset-env": "^7.10.4",

@@ -50,8 +50,18 @@ clean:
 	rm -fr .pytest_cache
 
 
-# Clears out and installs packages and dependencies using requirements-minimal.txt
-venv/bin/activate: requirements-minimal.txt
+# Cleans up, re-installs packages from requirements.txt
+venv/bin/activate: requirements.txt
+	rm -rf virtual_env/
+	python3 -m venv virtual_env
+	. virtual_env/bin/activate ;\
+	pip install --upgrade pip ;\
+	pip install -rrequirements.txt
+	touch virtual_env/bin/activate
+
+
+# Update python dependencies
+update-dependencies: requirements-minimal.txt
 	rm -rf virtual_env/
 	python3 -m venv virtual_env
 	. virtual_env/bin/activate ;\
@@ -59,7 +69,6 @@ venv/bin/activate: requirements-minimal.txt
 	pip install -Ur requirements-minimal.txt ;\
 	pip freeze | sort > requirements.txt
 	touch virtual_env/bin/activate
-
 
 # Run static type checker for python code.
 .PHONY: mypy
