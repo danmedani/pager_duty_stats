@@ -11,3 +11,4 @@ uwsgi
 flask
 pkce
 python-dotenv
+wheel
