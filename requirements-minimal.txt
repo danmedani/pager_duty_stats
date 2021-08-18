@@ -12,3 +12,4 @@ flask
 pkce
 python-dotenv
 wheel
+waitress
