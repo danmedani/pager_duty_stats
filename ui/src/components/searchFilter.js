@@ -23,7 +23,7 @@ class SearchFilter extends React.Component {
       chartType: 'SERVICE_NAME',
       filterType: 'team',
       loadingData: false,
-      startDate: '2020-05-01',
+      startDate: '2021-09-01',
       endDate: '',
       services: [],
       teams: [],
