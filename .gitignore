@@ -7,5 +7,7 @@ __pycache__
 .coverage
 node_modules
 ui/dist/*.bundle.js
+static/index.*
+static/stats.*
 .vscode/*
 virtual_env
