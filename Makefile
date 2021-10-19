@@ -65,3 +65,8 @@ lint:
 	@find pager_duty_stats tests -name *.py -exec reorder-python-imports {} +
 	@echo "    ----    Running linter    ----    "
 	@flake8 --config .flake8 pager_duty_stats/ tests/
+
+
+# You must be Dan to run this
+deploy:
+	gcloud app deploy
