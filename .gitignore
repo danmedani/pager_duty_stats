@@ -11,3 +11,4 @@ static/index.*
 static/stats.*
 .vscode/*
 virtual_env
+env
