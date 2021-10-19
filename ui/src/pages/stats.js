@@ -110,11 +110,6 @@ class ChartPage extends React.Component {
             />
           </div>
           <div>
-          <Button variant="contained" color="secondary" onClick={() => this.logOut()}>
-            Log Out
-          </Button>
-          </div>
-          <div>
             {this.state.searchButtonDisabled
               ?
               <div className="graph-area">
@@ -134,6 +129,11 @@ class ChartPage extends React.Component {
                   Patiently awaiting your search...
                 </div>
             }
+          </div>
+          <div id="logout">
+            <Button variant="contained" color="secondary" onClick={() => this.logOut()}>
+              Log Out
+            </Button>
           </div>
         </div>
     );

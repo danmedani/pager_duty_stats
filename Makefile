@@ -4,6 +4,8 @@ init: build
 	npm install webpack-cli
 	make webpack
 
+dev:
+	python main.py
 
 # Run webserver in dev environment
 .PHONY: web
@@ -15,11 +17,6 @@ web:
 .PHONY: webpackdev
 webpackdev:
 	npx webpack --mode development --config ui/webpack.config.dev.js
-
-
-# Build backend
-.PHONY: build
-build: clean venv/bin/activate
 
 
 # Build and run the full python test suite. Used as a target in travis CI.
@@ -45,30 +42,10 @@ webpack:
 # Delete temporary files & packages
 .PHONY: clean
 clean:
-	rm -fr virtual_env
+	rm -fr env
 	rm -fr .mypy_cache
 	rm -fr .pytest_cache
 
-
-# Cleans up, re-installs packages from requirements.txt
-venv/bin/activate: requirements.txt
-	rm -rf virtual_env/
-	python3 -m venv virtual_env
-	. virtual_env/bin/activate ;\
-	pip install --upgrade pip ;\
-	pip install -rrequirements.txt
-	touch virtual_env/bin/activate
-
-
-# Update python dependencies
-update-dependencies: requirements-minimal.txt
-	rm -rf virtual_env/
-	python3 -m venv virtual_env
-	. virtual_env/bin/activate ;\
-	pip install --upgrade pip ;\
-	pip install -Ur requirements-minimal.txt ;\
-	pip freeze | sort > requirements.txt
-	touch virtual_env/bin/activate
 
 # Run static type checker for python code.
 .PHONY: mypy
@@ -84,11 +61,3 @@ lint:
 	@find pager_duty_stats tests -name *.py -exec reorder-python-imports {} +
 	@echo "    ----    Running linter    ----    "
 	@flake8 --config .flake8 pager_duty_stats/ tests/
-
-
-# Package up the code up and deploy to aws
-# You need to be Dan to do this
-.PHONY: deploy
-deploy: build webpack
-	eb deploy PagerDutyStats-env
-	eb open PagerDutyStats-env
