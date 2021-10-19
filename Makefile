@@ -4,6 +4,10 @@ init: build
 	npm install webpack-cli
 	make webpack
 
+# Run first:
+# python3 -m venv env
+# source env/bin/activate
+# pip install -r requirements.txt
 dev:
 	python main.py
 
