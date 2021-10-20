@@ -13,7 +13,7 @@ dev:
 
 # Build backend
 .PHONY: build
-build: clean venv/bin/activate
+build: clean env/bin/activate
 
 # Cleans up, re-installs packages from requirements.txt
 env/bin/activate: requirements.txt
