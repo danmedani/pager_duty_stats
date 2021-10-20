@@ -11,6 +11,10 @@ init: build
 dev:
 	python main.py
 
+# Build backend
+.PHONY: build
+build: clean venv/bin/activate
+
 # Cleans up, re-installs packages from requirements.txt
 env/bin/activate: requirements.txt
 	rm -rf virtual_env/
