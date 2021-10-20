@@ -11,11 +11,14 @@ init: build
 dev:
 	python main.py
 
-# Run webserver in dev environment
-.PHONY: web
-web:
-	FLASK_APP=pager_duty_stats/application.py FLASK_ENV=development flask run
-
+# Cleans up, re-installs packages from requirements.txt
+env/bin/activate: requirements.txt
+	rm -rf virtual_env/
+	python3 -m venv virtual_env
+	. env/bin/activate ;\
+	pip install --upgrade pip ;\
+	pip install -rrequirements.txt
+	touch env/bin/activate
 
 # Bundle up the javascript code, dev mode (runs in background)
 .PHONY: webpackdev
