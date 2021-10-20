@@ -18,7 +18,7 @@ build: clean env/bin/activate
 # Cleans up, re-installs packages from requirements.txt
 env/bin/activate: requirements.txt
 	rm -rf virtual_env/
-	python3 -m venv virtual_env
+	python3 -m venv env
 	. env/bin/activate ;\
 	pip install --upgrade pip ;\
 	pip install -rrequirements.txt
