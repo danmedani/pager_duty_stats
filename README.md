@@ -15,9 +15,6 @@ Steps to setting up dev environment (you should already have `git`, `npm`, and `
 4) `source env/bin/activate`
 5) `make dev` (launches site locally)
 
-If you are working on the backend, it usually helps to be in the virtualenv:
-`source virtual_env/bin/activate`
-
 If you are working with the fronend, it's super useful to have webpack running in dev mode (it will automatically pick up changes):
 `make webpackdev`
 
