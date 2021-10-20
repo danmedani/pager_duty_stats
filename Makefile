@@ -1,6 +1,6 @@
 # Builds everything. To be used after first cloning the repo.
 .PHONY: init
-init: build
+init: clean build
 	npm install webpack-cli
 	make webpack
 
